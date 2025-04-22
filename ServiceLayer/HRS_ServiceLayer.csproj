@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="14.0.0" />
+    <PackageReference Include="Hangfire.Core" Version="1.8.18" />
+    <PackageReference Include="QuestPDF" Version="2025.4.0" />
+    <PackageReference Include="Stripe.net" Version="48.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BussinessLogic\HRS_BussinessLogic.csproj" />
+    <ProjectReference Include="..\DataAccess\HRS_DataAccess.csproj" />
+    <ProjectReference Include="..\HRS_SharedLayer\HRS_SharedLayer.csproj" />
+  </ItemGroup>
+
+</Project>
