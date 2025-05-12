@@ -1,0 +1,25 @@
+<div class="available-rooms-container">
+  <h2>Available Rooms</h2>
+
+  <div class="filter-section">
+    <label>Start Date:</label>
+    <input type="date" [(ngModel)]="startDate">
+    <label>End Date:</label>
+    <input type="date" [(ngModel)]="endDate">
+    <button (click)="loadAvailableRooms()">Search</button>
+  </div>
+
+  <div class="room-card" *ngFor="let room of availableRooms">
+    <img [src]="room.ImageUrl" alt="Room Image" width="250" height="150" />
+    <h3>Room #{{ room.roomNum }}</h3>
+    <p><strong>Price:</strong> ${{ room.pricePerNight }} / night</p>
+    <p><strong>Facilities:</strong> {{ room.Facilities }}</p>
+    <p><strong>Type:</strong> {{ room.roomType }}</p>
+    <p><strong>Status:</strong> <span [style.color]="room.isAvailable ? 'green' : 'red'">{{ room.isAvailable ?
+        'Available' : 'Not Available' }}</span></p>
+  </div>
+
+  <div *ngIf="availableRooms.length === 0">
+    <p>No available rooms found for the selected dates.</p>
+  </div>
+</div>

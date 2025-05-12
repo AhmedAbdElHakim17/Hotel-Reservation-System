@@ -1,0 +1,51 @@
+<div class="feedback-container">
+    <!-- Loading Spinner -->
+    <div *ngIf="isLoading" class="loading-spinner">
+        <mat-spinner diameter="40"></mat-spinner>
+        <span>Loading feedbacks...</span>
+    </div>
+
+    <!-- Error Message -->
+    <div *ngIf="errorMessage" class="error-message">
+        ⚠️ {{ errorMessage }}
+        <button mat-stroked-button color="warn" (click)="loadFeedbacks()">
+            <mat-icon>refresh</mat-icon> Retry
+        </button>
+    </div>
+
+    <!-- Success Content -->
+    <div *ngIf="!isLoading && Feedbacks.length > 0" class="success-content">
+        <!-- Success Header -->
+        <div class="success-header">
+            <mat-icon class="success-icon">check_circle</mat-icon>
+            <h3>Feedbacks Loaded Successfully</h3>
+        </div>
+
+        <!-- Feedback List -->
+        <mat-card *ngFor="let feedback of Feedbacks" class="feedback-card">
+            <mat-card-header>
+                <mat-card-title>{{ feedback.userName }}</mat-card-title>
+                <mat-card-subtitle>
+                    Reservation #{{ feedback.reservationId }}
+                    <span class="rating">
+                        <mat-icon *ngFor="let star of [1,2,3,4,5]" class="star">
+                            {{ star <= feedback.rating ? 'star' : 'star_border' }} </mat-icon>
+                    </span>
+                </mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+                <p>{{ feedback.comment }}</p>
+                <div class="date">
+                    <mat-icon>schedule</mat-icon>
+                    {{ feedback.submittedAt | date:'medium' }}
+                </div>
+            </mat-card-content>
+        </mat-card>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoading && Feedbacks.length === 0 && !errorMessage" class="empty-state">
+        <mat-icon>feedback</mat-icon>
+        <p>No feedbacks available yet</p>
+    </div>
+</div>

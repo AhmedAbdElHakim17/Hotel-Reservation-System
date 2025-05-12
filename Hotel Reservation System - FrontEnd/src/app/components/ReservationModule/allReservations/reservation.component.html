@@ -1,0 +1,65 @@
+<div class="container my-4">
+    <h2 class="mb-4 text-center text-primary">🏨 Reservation Management</h2>
+
+    <!-- 🔄 Loading Skeletons -->
+    <div *ngIf="isLoading" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        <div class="col" *ngFor="let skeleton of [1,2,3,4,5,6]">
+            <ngx-skeleton-loader count="1" [appearance]="'line'" [theme]="{
+          height: '180px',
+          borderRadius: '12px',
+          backgroundColor: '#e0e0e0',
+          marginBottom: '10px'
+        }">
+            </ngx-skeleton-loader>
+        </div>
+    </div>
+
+    <!-- ❌ Error Message -->
+    <div *ngIf="errorMessage && !isLoading" class="alert alert-danger mt-4" role="alert">
+        <strong>Error:</strong> {{ errorMessage }}
+    </div>
+
+    <!-- ✅ Reservations Cards -->
+    <div *ngIf="!isLoading && Reservations.length > 0" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        <div *ngFor="let reservation of Reservations" class="col">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        Guest: <span class="text-dark">{{ reservation.userName }}</span>
+                    </h5>
+                    <p class="card-text mb-1">
+                        Room #: <strong>{{ reservation.roomNum }}</strong>
+                    </p>
+                    <p class="card-text mb-1">
+                        Check-in: <strong>{{ reservation.checkInDate | date:'mediumDate' }}</strong>
+                    </p>
+                    <p class="card-text mb-1">
+                        Check-out: <strong>{{ reservation.checkOutDate | date:'mediumDate' }}</strong>
+                    </p>
+                    <p class="card-text">
+                        Status:
+                        <span class="badge" [ngClass]="{
+                          'bg-success': reservation.reservationStatus === 'Confirmed' || reservation.reservationStatus === 'CheckedIn',
+                          'bg-warning': reservation.reservationStatus === 'Pending',
+                          'bg-danger': reservation.reservationStatus === 'Cancelled' || reservation.reservationStatus === 'Expired',
+                          'bg-info': reservation.reservationStatus === 'CheckedOut'
+                        }">
+                            {{ reservation.reservationStatus }}
+                        </span>
+                    </p>
+                    <p class="card-text mb-1">
+                        Total Amount: <strong>{{ reservation.totalAmount | currency}}</strong>
+                    </p>
+                    <p class="card-text mb-1">
+                        Created At: <strong>{{ reservation.createdAt | date:"mediumDate"}}</strong>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 📭 No Reservations -->
+    <div *ngIf="!isLoading && Reservations?.length === 0 && !errorMessage" class="text-center text-muted mt-5">
+        <p>No reservations found.</p>
+    </div>
+</div>

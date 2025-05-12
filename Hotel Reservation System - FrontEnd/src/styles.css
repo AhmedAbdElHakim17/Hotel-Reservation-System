@@ -1,0 +1,13 @@
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+.swal2-popup {
+    font-family: 'Your Font', sans-serif;
+}
+
+.swal2-title {
+    font-size: 1.5rem;
+}
+
+.swal2-confirm {
+    background-color: #0d6efd !important;
+}

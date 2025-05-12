@@ -1,0 +1,79 @@
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">ECommerce</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#" [routerLink]="['/Home']"
+                        routerLinkActive="bg-success">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#" [routerLink]="['/About']"
+                        routerLinkActive="bg-success">About Us</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#" [routerLink]="['/Contact']"
+                        routerLinkActive="bg-success">Contact Us</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#" [routerLink]="['/Feedback']"
+                        routerLinkActive="bg-success">Feedbacks</a>
+                </li>
+                <div class="row">
+                    <div class="col">
+                        <div ngbDropdown class="d-inline-block">
+                            <button type="button" class="btn btn-outline-primary" id="dropdownBasic1" ngbDropdownToggle>
+                                Reservation
+                            </button>
+                            <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+                                <button ngbDropdownItem><a class="nav-link active" aria-current="page" href="#"
+                                        [routerLink]="['/Reservation/All']"
+                                        routerLinkActive="bg-success">Reservations</a></button>
+                                <button ngbDropdownItem><a class="nav-link active" aria-current="page" href="#"
+                                        [routerLink]="['/Reservation/allUpcoming']"
+                                        routerLinkActive="bg-success">UpcomingReservations</a></button>
+                                <button ngbDropdownItem><a class="nav-link active" aria-current="page" href="#"
+                                        [routerLink]="['/Reservation/My']"
+                                        routerLinkActive="bg-success">MyReservations</a></button>
+                                <button ngbDropdownItem><a class="nav-link active" aria-current="page" href="#"
+                                        [routerLink]="['/Reservation/MyUpcoming']"
+                                        routerLinkActive="bg-success">MyUpcomingReservations</a></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#" [routerLink]="['/Room/All']"
+                        routerLinkActive="bg-success">Rooms</a>
+                </li>
+                <div ngbDropdown class="d-inline-block">
+                    <button type="button" class="btn btn-outline-primary" id="dropdownBasic1" ngbDropdownToggle>
+                        Authentication
+                    </button>
+                    <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+                        <button ngbDropdownItem><a class="nav-link active" aria-current="page" href="#"
+                                [routerLink]="['/login']" routerLinkActive="bg-success">Login</a></button>
+                        <button ngbDropdownItem><a class="nav-link active" aria-current="page" href="#"
+                                [routerLink]="['/register']" routerLinkActive="bg-success">Register</a></button>
+                    </div>
+                </div>
+                <!-- <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#" [routerLink]="['/login']"
+                        routerLinkActive="bg-success">Login</a>
+                </li> -->
+                <!-- <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#" [routerLink]="['/register']"
+                        routerLinkActive="bg-success">Register</a>
+                </li> -->
+                <li class="nav-item">
+                    <a class="nav-link active fas fa-sign-out-alt" aria-current="page" href="#" (click)="logout()">Logout</a>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+</nav>

@@ -1,0 +1,49 @@
+<!-- <form (ngSubmit)="AddReservation()" #reservationForm="ngForm">
+  <input type="text" name="guestName" [(ngModel)]="Reservation.userName" required placeholder="Guest Name" />
+  <input type="date" name="checkIn" [(ngModel)]="Reservation.checkInDate" required />
+  <input type="date" name="checkOut" [(ngModel)]="Reservation.checkOutDate" required />
+  <button type="submit" [disabled]="isLoading || reservationForm.invalid">
+    {{ isLoading ? 'Adding...' : 'Add Reservation' }}
+  </button>
+</form> -->
+<mat-card>
+  <h2>Reservation Form</h2>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Customer Name</mat-label>
+    <input matInput [(ngModel)]="reservation.userName">
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Room Number</mat-label>
+    <input matInput type="number" [(ngModel)]="reservation.roomNum">
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Check-in Date</mat-label>
+    <input matInput type="date" [(ngModel)]="reservation.checkInDate">
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Check-out Date</mat-label>
+    <input matInput type="date" [(ngModel)]="reservation.checkOutDate">
+  </mat-form-field>
+
+  <div class="actions">
+    <button mat-raised-button color="primary" (click)="Save()" [disabled]="isLoading">
+      {{ reservation.id ? 'Update' : 'Add' }} Reservation
+    </button>
+    <!-- <button mat-raised-button color="warn" (click)="cancel()" [disabled]="!reservation.id || isLoading">
+      Delete
+    </button> -->
+  </div>
+
+  <p *ngIf="message" [ngClass]="{'info-message': isSuccess, 'error-message': !isSuccess}">
+    {{ message }}
+  </p>
+</mat-card>
+<div class="actions">
+  <button mat-raised-button color="accent" (click)="confirm()" [disabled]="!reservation.id">Confirm</button>
+  <button mat-raised-button color="primary" (click)="checkIn()" [disabled]="!reservation.id">Check-In</button>
+  <button mat-raised-button color="warn" (click)="checkOut()" [disabled]="!reservation.id">Check-Out</button>
+</div>
