@@ -12,8 +12,6 @@ using HRS_BussinessLogic.Models;
 using Microsoft.Extensions.Configuration;
 using System.Security.Claims;
 using HRS_BussinessLogic.DTOs.Queries;
-using Microsoft.IdentityModel.Tokens;
-
 namespace HRS_ServiceLayer.Services
 {
     public class PaymentService : IPaymentService
@@ -24,7 +22,7 @@ namespace HRS_ServiceLayer.Services
         private readonly IEmailService emailService;
 
         public PaymentService(IUnitOfWork unitOfWork, IMapper mapper,
-            IConfiguration configuration,IEmailService emailService)
+            IConfiguration configuration, IEmailService emailService)
         {
             this.unitOfWork = unitOfWork;
             this.mapper = mapper;
@@ -44,7 +42,7 @@ namespace HRS_ServiceLayer.Services
             }
             catch (Exception ex)
             {
-                return new ResponseDTO<PaymentDTO>($"Error: {ex.Message}", null);
+                return HandleError<PaymentDTO>("Failed To add payment", ex);
             }
         }
 
@@ -60,7 +58,7 @@ namespace HRS_ServiceLayer.Services
             }
             catch (Exception ex)
             {
-                return new ResponseDTO<List<PaymentDTO>>($"Error: {ex.Message}", null);
+                return HandleError<List<PaymentDTO>>("Failed to get all payments", ex);
             }
         }
         public async Task<ResponseDTO<Session>> CreatePaymentIntentAsync(decimal amount, int reservationId, ClaimsPrincipal User)
@@ -79,7 +77,7 @@ namespace HRS_ServiceLayer.Services
                     return new ResponseDTO<Session>("Invalid Reservation Id, Please enter your reservation Id correctly", null);
                 }
                 var reservation = await unitOfWork.Reservations.GetByIdAsync(reservationId);
-                if (reservation == null) 
+                if (reservation == null)
                     return new ResponseDTO<Session>("Incorrect ReservationId, Please enter The valid one", null);
                 if (amount != reservation.TotalAmount)
                     return new ResponseDTO<Session>("Incorrect Input, Please enter the requested amount", null);
@@ -111,8 +109,8 @@ namespace HRS_ServiceLayer.Services
                     },
                     CustomerEmail = user.Email,
                     Mode = "payment",
-                    SuccessUrl = "https://83f1-156-198-210-136.ngrok-free.app/api/Payment/success",
-                    CancelUrl = "https://83f1-156-198-210-136.ngrok-free.app/api/Payment/cancel",
+                    SuccessUrl = configuration["Stripe:successUrl"],
+                    CancelUrl = configuration["Stripe:cancelUrl"],
                     ClientReferenceId = reservationId.ToString(),
                 };
 
@@ -122,7 +120,7 @@ namespace HRS_ServiceLayer.Services
             }
             catch (Exception ex)
             {
-                return new ResponseDTO<Session>($"Error: {ex.Message}", null);
+                return HandleError<Session>("Failed to create payment intent", ex);
             }
         }
         public async Task<ResponseDTO<PaymentDTO>> StripeWebhookAsync(HttpContext context)
@@ -131,44 +129,55 @@ namespace HRS_ServiceLayer.Services
             var sigHeader = context.Request.Headers["Stripe-Signature"];
             if (String.IsNullOrEmpty(sigHeader))
                 return new ResponseDTO<PaymentDTO>("It's not usable", null);
-            var stripeEvent = EventUtility.ConstructEvent(
-                json,
-                sigHeader,
-                configuration["Stripe:WebhookSecret"],
-                tolerance: 300
-            );
-
-            if (stripeEvent.Type == "checkout.session.completed")
+            try
             {
-                var session = stripeEvent.Data.Object as Session;
-                var reservationId = session.ClientReferenceId;
+                var stripeEvent = EventUtility.ConstructEvent(
+                    json,
+                    sigHeader,
+                    configuration["Stripe:WebhookSecret"],
+                    tolerance: 300
+                );
 
-                var reservation = await unitOfWork.Reservations
-                    .FindAsync(r => r.Id == int.Parse(reservationId),
-                    nameof(Reservation.Room));
-                if (reservation != null)
+                if (stripeEvent.Type == "checkout.session.completed")
                 {
-                    reservation.ReservationStatus = ReservationStatus.Confirmed;
+                    var session = stripeEvent.Data.Object as Session;
+                    var reservationId = session.ClientReferenceId;
 
-                    var payment = new Payment
+                    var reservation = await unitOfWork.Reservations
+                        .FindAsync(r => r.Id == int.Parse(reservationId),
+                        nameof(Reservation.Room));
+                    if (reservation != null)
                     {
-                        ReservationId = reservation.Id,
-                        Amount = reservation.TotalAmount,
-                        PaymentMethod = PaymentMethod.CreditCard,
-                        PaymentStatus = PaymentStatus.Paid,
-                        TransactionDate = DateTime.Now
-                    };
+                        reservation.ReservationStatus = ReservationStatus.Confirmed;
 
-                    await unitOfWork.Payments.AddAsync(payment);
-                    unitOfWork.Reservations.Update(reservation);
-                    await unitOfWork.CompleteAsync();
+                        var payment = new Payment
+                        {
+                            ReservationId = reservation.Id,
+                            Amount = reservation.TotalAmount,
+                            PaymentMethod = PaymentMethod.CreditCard,
+                            PaymentStatus = PaymentStatus.Paid,
+                            TransactionDate = DateTime.Now
+                        };
 
-                    var response = await emailService.GetInvoicePdfAsync( reservation.Id );
-                    if (!response.IsSuccess)
-                        return new ResponseDTO<PaymentDTO>("Invoce doesn't exist", null);
+                        await unitOfWork.Payments.AddAsync(payment);
+                        unitOfWork.Reservations.Update(reservation);
+                        await unitOfWork.CompleteAsync();
+
+                        var response = await emailService.GetInvoicePdfAsync(reservation.Id);
+                        if (!response.IsSuccess)
+                            return new ResponseDTO<PaymentDTO>("Invoce doesn't exist", null);
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                return HandleError<PaymentDTO>("Invalid Stripe Signature", ex);
+            }
             return new ResponseDTO<PaymentDTO>("Succedded", new PaymentDTO());
+        }
+        private static ResponseDTO<T> HandleError<T>(string message, Exception ex)
+        {
+            return new ResponseDTO<T>($"Error: {message}-{ex.Message}", default);
         }
     }
 }

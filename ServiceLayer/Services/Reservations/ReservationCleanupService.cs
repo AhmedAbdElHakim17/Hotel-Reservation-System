@@ -20,7 +20,7 @@ namespace HRS_ServiceLayer.Services.Reservations
             var expiredRes = await unitOfWork.Reservations
                 .FindAllAsync(
                     r => (r.CheckOutDate <= DateTime.Now &&
-                         r.ReservationStatus == ReservationStatus.CheckedIn) 
+                         r.ReservationStatus == ReservationStatus.CheckedIn)
                          ||
                          (r.CheckInDate <= DateTime.Now &&
                          (r.ReservationStatus == ReservationStatus.Confirmed ||
@@ -30,9 +30,9 @@ namespace HRS_ServiceLayer.Services.Reservations
             foreach (var r in expiredRes)
             {
                 r.ReservationStatus = ReservationStatus.Expired;
-                r.Room.IsAvailable = true;
+                if (r.ReservationStatus == ReservationStatus.CheckedIn && r.Room != null)
+                    r.Room.IsAvailable = true;
                 logger.LogInformation($"Reservation Status with id {r.Id} is Expired");
-                unitOfWork.Reservations.Update(r);
             }
             await unitOfWork.CompleteAsync();
         }

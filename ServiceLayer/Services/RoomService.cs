@@ -1,11 +1,6 @@
 ﻿using AutoMapper;
 using HRS_DataAccess.Models;
 using HRS_DataAccess;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using HRS_ServiceLayer.IServices;
 using HRS_BussinessLogic.DTOs.Queries;
 
@@ -34,6 +29,8 @@ namespace HRS_ServiceLayer.Services
 
         public async Task<ResponseDTO<List<RoomGetDTO>>> GetAvailableRoomsAsync(DateTime from, DateTime to)
         {
+            if (from > to)
+                return new ResponseDTO<List<RoomGetDTO>>("From must be earlier than To", null);
             var availableRooms = await unitOfWork.Rooms.GetAllAvailableAsync(from, to);
             if (availableRooms == null || availableRooms.Count == 0)
                 return new ResponseDTO<List<RoomGetDTO>>("No available rooms found", null);

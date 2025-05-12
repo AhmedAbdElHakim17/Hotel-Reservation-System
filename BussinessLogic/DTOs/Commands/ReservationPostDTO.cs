@@ -19,9 +19,9 @@ namespace HRS_BussinessLogic.DTOs.Commands
         [JsonIgnore]
         public ReservationStatus ReservationStatus { get; set; } = ReservationStatus.Pending;
         public DateTime CreatedAt { get; set; }
-        [Required(ErrorMessage ="User Name is required")]
-        [StringLength(100, ErrorMessage = "Name cannot exceed 100 characters.")]
-        public string? UserName { get; set; }
+        //[Required(ErrorMessage ="User Name is required")]
+        //[StringLength(100, ErrorMessage = "Name cannot exceed 100 characters.")]
+        //public string? UserName { get; set; }
         [Required(ErrorMessage ="Room Number is required")]
         [Range(1,200,ErrorMessage ="Room Number must be between 1 and 200")]
         public int RoomNum { get; set; }

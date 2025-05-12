@@ -19,6 +19,7 @@ using HRS_ServiceLayer.Services.Offers;
 using HRS_SharedLayer.Interfaces.IBases;
 using HRS_BussinessLogic.Validators;
 using Microsoft.Extensions.DependencyInjection;
+using System.Net.Mail;
 namespace HRS.Presentation
 {
     public class Program
@@ -48,7 +49,7 @@ namespace HRS.Presentation
                     .FromAssemblyOf<IUserService>()
                         .AddClasses(c => c.Where(type => type.Name.EndsWith("Service")))
                             .AsImplementedInterfaces()
-                                .WithTransientLifetime());
+                                .WithScopedLifetime());
             QuestPDF.Settings.License = LicenseType.Community;
             #endregion
             // ----------------------------------------------------------------------------
@@ -117,11 +118,11 @@ namespace HRS.Presentation
             var app = builder.Build();
             var recurringJob = app.Services.GetRequiredService<IRecurringJobManager>();
             recurringJob.AddOrUpdate<ReservationCleanupService>("ReservatinCleanup",
-                x => x.MarkExpiredReservationsAsync(), Cron.Hourly(22));
+                x => x.MarkExpiredReservationsAsync(), Cron.Hourly(55));
             recurringJob.AddOrUpdate<ReservationStatusService>("UpdateRoomAvailability",
-                x => x.UpdateRoomAvailabilityAsync(), Cron.Hourly(22));
+                x => x.UpdateRoomAvailabilityAsync(), Cron.Hourly(55));
             recurringJob.AddOrUpdate<OfferCleanupService>("OfferCleanup",
-                x => x.MarkExpiredOffers(), Cron.Hourly(22));
+                x => x.MarkExpiredOffers(), Cron.Hourly(55));
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

@@ -16,16 +16,25 @@ namespace HRS_ServiceLayer.Services
     public class UserService(IUnitOfWork unitOfWork, IMapper mapper
         , IConfiguration configuration) : IUserService
     {
-        public async Task<AppUser> GetCurrentUserAsync(ClaimsPrincipal user)
+        public async Task<AppUser> GetCurrentUserAsync(ClaimsPrincipal claims)
         {
-            return await unitOfWork.UserManager.FindByNameAsync(user.Identity.Name);
+            return await unitOfWork.UserManager.FindByNameAsync(claims.FindFirstValue(ClaimTypes.Name));
+        }
+        public async Task<ResponseDTO<RoleDTO>> GetUserRoleAsync(ClaimsPrincipal claims)
+        {
+            var user = await GetCurrentUserAsync(claims);
+            if (user == null) 
+                return new ResponseDTO<RoleDTO>("User Not found", null);
+            var role = (await unitOfWork.UserManager.GetRolesAsync(user)).FirstOrDefault();
+            var roleVM = new RoleDTO { Id=null, Name = role, NormalizedName = role.ToUpper()};
+            return new ResponseDTO<RoleDTO>("role retrieved successfully", roleVM);
         }
 
         public async Task<ResponseDTO<AuthDTO>> LoginAsync(LoginDTO loginDTO)
         {
             try
             {
-                var user = await unitOfWork.UserManager.FindByNameAsync(loginDTO.UserName);
+                var user = await unitOfWork.UserManager.FindByEmailAsync(loginDTO.Email);
                 if (user == null)
                     return new ResponseDTO<AuthDTO>("user not found", null);
                 bool found = await unitOfWork.UserManager.CheckPasswordAsync(user, loginDTO.Password);
@@ -36,6 +45,7 @@ namespace HRS_ServiceLayer.Services
 
                     Claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id));
                     Claims.Add(new Claim(ClaimTypes.Name, user.UserName));
+                    Claims.Add(new Claim(ClaimTypes.Email, user.Email));
 
                     var Roles = await unitOfWork.UserManager.GetRolesAsync(user);
                     foreach (var Role in Roles)

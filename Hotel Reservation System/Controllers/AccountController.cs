@@ -43,5 +43,22 @@ namespace HRS.Presentation.Controllers
                 return StatusCode(500, "Internal Server Error");
             }
         }
+        [HttpGet("UserRole")]
+        public async Task<IActionResult> GetUserRole()
+        {
+            try
+            {
+                var response = await userService.GetUserRoleAsync(User);
+                if (response == null) return BadRequest(response.Message);
+                return Ok(response);
+
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error While getting the role");
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
     }
 }

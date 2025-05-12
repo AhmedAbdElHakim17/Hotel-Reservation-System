@@ -22,7 +22,6 @@ namespace BussinessLogic
             // Reservations
             CreateMap<Reservation, ReservationPostDTO>()
                 .ForMember(dest => dest.RoomNum, src => src.MapFrom(src => src.Room.RoomNum != 0? src.Room.RoomNum : 0 ))
-                .ForMember(dest => dest.UserName, src => src.MapFrom(src => src.User.UserName ?? "No UserName"))
                 .ReverseMap();
 
             CreateMap<Reservation, ReservationGetDTO>()

@@ -51,9 +51,7 @@ namespace HRS.Presentation.Controllers
         {
             try
             {
-                var user = await userService.GetCurrentUserAsync(User);
-                if (user == null) return NotFound("User not found");
-                var response = await reservationService.GetUserUpcomingReservationsAsync(user);
+                var response = await reservationService.GetUserUpcomingReservationsAsync(User);
                 if (!response.IsSuccess) return BadRequest(response.Message);
                 return Ok(response);
             }
@@ -69,9 +67,7 @@ namespace HRS.Presentation.Controllers
         {
             try
             {
-                var user = await userService.GetCurrentUserAsync(User);
-                if (user == null) return NotFound("User not found");
-                var response = await reservationService.GetAllUserReservationsAsync(user);
+                var response = await reservationService.GetAllUserReservationsAsync(User);
                 if (!response.IsSuccess) return BadRequest(response.Message);
                 return Ok(response);
             }
@@ -105,7 +101,7 @@ namespace HRS.Presentation.Controllers
             if (!ModelState.IsValid) return BadRequest(ModelState);
             try
             {
-                var response = await reservationService.AddReservationAsync(reservationDTO);
+                var response = await reservationService.AddReservationAsync(reservationDTO, User);
                 if (!response.IsSuccess) return BadRequest(response.Message);
                 return Ok(response);
             }
@@ -132,13 +128,13 @@ namespace HRS.Presentation.Controllers
                 return StatusCode(500, "Internal Server Error");
             }
         }
-        [HttpPut("CheckIn/{id:int}")]
+        [HttpPatch("CheckIn/{id:int}")]
         [Authorize(Roles = "Admin,HotelStaff")]
         public async Task<IActionResult> CheckIn(int id)
         {
             try
             {
-                var response = await reservationService.CheckInReservationAsync(id);
+                var response = await reservationService.CheckInReservationAsync(id,User);
                 if (!response.IsSuccess) return BadRequest(response.Message);
                 return Ok(response);
             }
@@ -148,13 +144,13 @@ namespace HRS.Presentation.Controllers
                 return StatusCode(500, "Internal Server Error");
             }
         }
-        [HttpPut("Confirm/{id:int}")]
+        [HttpPatch("Confirm/{id:int}")]
         [Authorize(Roles = "Admin,HotelStaff")]
         public async Task<IActionResult> Confirm(int id)
         {
             try
             {
-                var response = await reservationService.ConfirmReservationAsync(id);
+                var response = await reservationService.ConfirmReservationAsync(id, User);
                 if (!response.IsSuccess) return BadRequest(response.Message);
                 return Ok(response);
             }
@@ -164,13 +160,13 @@ namespace HRS.Presentation.Controllers
                 return StatusCode(500, "Internal Server Error");
             }
         }
-        [HttpPut("CheckOut/{id:int}")]
+        [HttpPatch("CheckOut/{id:int}")]
         [Authorize(Roles = "Admin,HotelStaff")]
         public async Task<IActionResult> CheckOut(int id)
         {
             try
             {
-                var response = await reservationService.CheckOutReservationAsync(id);
+                var response = await reservationService.CheckOutReservationAsync(id, User);
                 if (!response.IsSuccess) return BadRequest(response.Message);
                 return Ok(response);
             }

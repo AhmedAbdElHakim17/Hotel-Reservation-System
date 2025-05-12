@@ -10,5 +10,6 @@ namespace HRS_ServiceLayer.IServices
         public Task<AppUser> GetCurrentUserAsync(ClaimsPrincipal user);
         Task<ResponseDTO<UserGetDTO>> RegisterAsync(UserPostDTO userPostDTO);
         Task<ResponseDTO<AuthDTO>> LoginAsync(LoginDTO loginDTO);
+        Task<ResponseDTO<RoleDTO>> GetUserRoleAsync(ClaimsPrincipal claims);
     }
 }

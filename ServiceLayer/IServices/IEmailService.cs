@@ -10,9 +10,9 @@ namespace HRS_ServiceLayer.IServices
     public interface IEmailService
     {
         Task<ResponseDTO<InvoiceDTO>> GenerateInvoiceAsync(int reservationId);
-        byte[] Generate(InvoiceDTO dto);
-        Task SendInvoiceEmailAsync(string toEmail, string guestName, byte[] pdfData, string invoiceNumber);
-        Task SendReservationEmailAsync(string toEmail, string guestName);
+        ResponseDTO<byte[]> Generate(InvoiceDTO dto);
+        Task<ResponseDTO<object>> SendInvoiceEmailAsync(string toEmail, string guestName, byte[] pdfData, string invoiceNumber);
+        Task<ResponseDTO<object>> SendReservationEmailAsync(string toEmail, string guestName);
         Task<ResponseDTO<byte[]>> GetInvoicePdfAsync(int reservationId);
     }
 }

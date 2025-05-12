@@ -9,26 +9,14 @@ using HRS_SharedLayer.Enums;
 using Microsoft.Extensions.Configuration;
 using Stripe;
 using Stripe.Checkout;
+using System.Security.Claims;
 using PaymentMethod = HRS_SharedLayer.Enums.PaymentMethod;
 
 namespace HRS_ServiceLayer.Services.Reservations
 {
-    public class ReservationService : IReservationService
+    public class ReservationService(IUnitOfWork unitOfWork, IMapper mapper,
+        IConfiguration configuration, IEmailService emailService) : IReservationService
     {
-        private readonly IUnitOfWork unitOfWork;
-        private readonly IMapper mapper;
-        private readonly IConfiguration configuration;
-        private readonly IEmailService emailService;
-
-        public ReservationService(IUnitOfWork unitOfWork, IMapper mapper, 
-            IConfiguration configuration, IEmailService emailService)
-        {
-            this.unitOfWork = unitOfWork;
-            this.mapper = mapper;
-            this.configuration = configuration;
-            this.emailService = emailService;
-        }
-
         public async Task<ResponseDTO<List<ReservationGetDTO>>> GetAllReservationsAsync()
         {
             try
@@ -47,10 +35,10 @@ namespace HRS_ServiceLayer.Services.Reservations
             try
             {
                 var reservations = await unitOfWork.Reservations
-                    .FindAllAsync(r=>r.CheckOutDate >= DateTime.Now &&
+                    .FindAllAsync(r => r.CheckOutDate >= DateTime.Now &&
                                      (r.ReservationStatus == ReservationStatus.Pending ||
                                      r.ReservationStatus == ReservationStatus.Confirmed)
-                                    ,nameof(Reservation.Room), nameof(Reservation.User));
+                                    , nameof(Reservation.Room), nameof(Reservation.User));
                 var reservationDTOs = mapper.Map<List<ReservationGetDTO>>(reservations);
                 return new ResponseDTO<List<ReservationGetDTO>>("Reservations retrieved successfully", reservationDTOs);
             }
@@ -59,11 +47,14 @@ namespace HRS_ServiceLayer.Services.Reservations
                 return new ResponseDTO<List<ReservationGetDTO>>($"Error: {ex.Message}", null);
             }
         }
-        public async Task<ResponseDTO<List<ReservationGetDTO>>> GetAllUserReservationsAsync(AppUser user)
+        public async Task<ResponseDTO<List<ReservationGetDTO>>> GetAllUserReservationsAsync(ClaimsPrincipal claims)
         {
             try
             {
-                var reservations = await unitOfWork.Reservations.FindAllAsync(r => r.UserId == user.Id,
+                var userId = claims.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (claims == null || userId == null)
+                    return new ResponseDTO<List<ReservationGetDTO>>("User not found", null);
+                var reservations = await unitOfWork.Reservations.FindAllAsync(r => r.UserId == userId,
                     nameof(Reservation.Room), nameof(Reservation.User));
                 var reservationDTOs = mapper.Map<List<ReservationGetDTO>>(reservations);
                 return new ResponseDTO<List<ReservationGetDTO>>("User reservations retrieved successfully", reservationDTOs);
@@ -73,12 +64,15 @@ namespace HRS_ServiceLayer.Services.Reservations
                 return new ResponseDTO<List<ReservationGetDTO>>($"Error: {ex.Message}", null);
             }
         }
-        public async Task<ResponseDTO<List<ReservationGetDTO>>> GetUserUpcomingReservationsAsync(AppUser user)
+        public async Task<ResponseDTO<List<ReservationGetDTO>>> GetUserUpcomingReservationsAsync(ClaimsPrincipal claims)
         {
             try
             {
+                var userId = claims.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (claims == null || userId == null)
+                    return new ResponseDTO<List<ReservationGetDTO>>("User not found", null);
                 var reservations = await unitOfWork.Reservations
-                    .FindAllAsync(r => r.UserId == user.Id &&
+                    .FindAllAsync(r => r.UserId == userId &&
                                        r.CheckInDate > DateTime.Now &&
                                        (r.ReservationStatus == ReservationStatus.Pending ||
                                        r.ReservationStatus == ReservationStatus.Confirmed),
@@ -92,7 +86,7 @@ namespace HRS_ServiceLayer.Services.Reservations
             }
         }
 
-        public async Task<ResponseDTO<ReservationGetDTO>> AddReservationAsync(ReservationPostDTO reservationDTO)
+        public async Task<ResponseDTO<ReservationGetDTO>> AddReservationAsync(ReservationPostDTO reservationDTO, ClaimsPrincipal claims)
         {
             try
             {
@@ -100,18 +94,16 @@ namespace HRS_ServiceLayer.Services.Reservations
                 if (!validationResponse.IsSuccess) return validationResponse;
                 var room = await unitOfWork.Rooms.FindAsync(r => r.RoomNum == reservationDTO.RoomNum);
                 if (room == null) return new ResponseDTO<ReservationGetDTO>("Room not found", null);
-                var user = await unitOfWork.UserManager.FindByNameAsync(reservationDTO.UserName);
-                if (user == null) return new ResponseDTO<ReservationGetDTO>("User not found", null);
                 var reservation = mapper.Map<Reservation>(reservationDTO);
                 reservation.RoomId = room.Id;
-                reservation.UserId = user.Id;
+                reservation.UserId = claims.FindFirstValue(ClaimTypes.NameIdentifier);
                 reservation.TotalAmount = await CalculateReservationTotalAmount(reservation, room);
                 await unitOfWork.Reservations.AddAsync(reservation);
                 await unitOfWork.CompleteAsync();
-                await emailService.SendReservationEmailAsync(user.Email, user.UserName);
+                await emailService.SendReservationEmailAsync(claims.FindFirstValue(ClaimTypes.Email) ?? "No Username", claims.FindFirstValue(ClaimTypes.Name) ?? "No Username");
                 reservation.Room = room;
-                reservation.User = user;
                 var resultDTO = mapper.Map<ReservationGetDTO>(reservation);
+                resultDTO.UserName = claims.FindFirstValue(ClaimTypes.Name) ?? "";
                 return new ResponseDTO<ReservationGetDTO>("Reservation added successfully", resultDTO);
             }
             catch (Exception ex)
@@ -171,7 +163,6 @@ namespace HRS_ServiceLayer.Services.Reservations
                     return new ResponseDTO<ReservationGetDTO>("No payment found to refund", null);
 
                 reservation.ReservationStatus = ReservationStatus.Cancelled;
-                reservation.Room.IsAvailable = true;
                 payment.PaymentStatus = PaymentStatus.Refunded;
                 unitOfWork.Reservations.Update(reservation);
                 unitOfWork.Payments.Update(payment);
@@ -185,22 +176,23 @@ namespace HRS_ServiceLayer.Services.Reservations
                 return new ResponseDTO<ReservationGetDTO>($"Error: {ex.Message}", null);
             }
         }
-        public async Task<ResponseDTO<ReservationGetDTO>> CheckInReservationAsync(int id)
+        public async Task<ResponseDTO<ReservationGetDTO>> CheckInReservationAsync(int id, ClaimsPrincipal claims)
         {
             try
             {
                 var reservation = await unitOfWork.Reservations
-                    .FindAsync(r => r.Id == id, nameof(Reservation.User), nameof(Reservation.Room));
+                    .FindAsync(r => r.Id == id, nameof(Reservation.Room));
                 if (reservation == null)
                     return new ResponseDTO<ReservationGetDTO>("Reservation not found", null);
                 if (reservation.CheckOutDate < DateTime.Now)
-                    return new ResponseDTO<ReservationGetDTO>("Reservation Expired",null);
+                    return new ResponseDTO<ReservationGetDTO>("Reservation Expired", null);
                 if (reservation.CheckInDate > DateTime.Now)
                     return new ResponseDTO<ReservationGetDTO>("Reservation CheckIn Date hasn't come yet", null);
                 if (reservation.ReservationStatus != ReservationStatus.Confirmed)
                     return new ResponseDTO<ReservationGetDTO>("Reservation must be confirmed before CheckedIn", null);
                 reservation.ReservationStatus = ReservationStatus.CheckedIn;
                 var resultDTO = mapper.Map<ReservationGetDTO>(reservation);
+                resultDTO.UserName = claims.FindFirstValue(ClaimTypes.Name) ?? "No UserName";
                 unitOfWork.Reservations.Update(reservation);
                 await unitOfWork.CompleteAsync();
                 return new ResponseDTO<ReservationGetDTO>("Reservation CheckedIn", resultDTO);
@@ -210,12 +202,12 @@ namespace HRS_ServiceLayer.Services.Reservations
                 return new ResponseDTO<ReservationGetDTO>($"Error: {ex.Message}", null);
             }
         }
-        public async Task<ResponseDTO<ReservationGetDTO>> ConfirmReservationAsync(int id)
+        public async Task<ResponseDTO<ReservationGetDTO>> ConfirmReservationAsync(int id, ClaimsPrincipal claims)
         {
             try
             {
                 var reservation = await unitOfWork.Reservations
-                    .FindAsync(r => r.Id == id, nameof(Reservation.User), nameof(Reservation.Room));
+                    .FindAsync(r => r.Id == id, nameof(Reservation.Room));
                 if (reservation == null)
                     return new ResponseDTO<ReservationGetDTO>("Reservation not found", null);
                 if (reservation.CheckOutDate < DateTime.Now)
@@ -224,7 +216,7 @@ namespace HRS_ServiceLayer.Services.Reservations
                     return new ResponseDTO<ReservationGetDTO>("Reservation must be Pending before Confirmed", null);
                 reservation.ReservationStatus = ReservationStatus.Confirmed;
 
-                var payment = await unitOfWork.Payments.FindAsync(p=>p.ReservationId == id);
+                var payment = await unitOfWork.Payments.FindAsync(p => p.ReservationId == id);
                 if (payment == null)
                     return new ResponseDTO<ReservationGetDTO>("Payment not found", null);
                 payment.PaymentStatus = PaymentStatus.Paid;
@@ -235,6 +227,7 @@ namespace HRS_ServiceLayer.Services.Reservations
                 await unitOfWork.CompleteAsync();
 
                 var resultDTO = mapper.Map<ReservationGetDTO>(reservation);
+                resultDTO.UserName = claims.FindFirstValue(ClaimTypes.Name) ?? "No Username";
                 return new ResponseDTO<ReservationGetDTO>("Reservation Confirmed", resultDTO);
             }
             catch (Exception ex)
@@ -242,13 +235,13 @@ namespace HRS_ServiceLayer.Services.Reservations
                 return new ResponseDTO<ReservationGetDTO>($"Error: {ex.Message}", null);
             }
         }
-        public async Task<ResponseDTO<ReservationGetDTO>> CheckOutReservationAsync(int id)
+        public async Task<ResponseDTO<ReservationGetDTO>> CheckOutReservationAsync(int id, ClaimsPrincipal claims)
         {
             try
             {
 
                 var reservation = await unitOfWork.Reservations
-                    .FindAsync(r => r.Id == id, nameof(Reservation.User), nameof(Reservation.Room));
+                    .FindAsync(r => r.Id == id, nameof(Reservation.Room));
                 if (reservation == null)
                     return new ResponseDTO<ReservationGetDTO>("Reservation not found", null);
                 if (reservation.CheckOutDate < DateTime.Now)
@@ -256,10 +249,12 @@ namespace HRS_ServiceLayer.Services.Reservations
                 if (reservation.ReservationStatus != ReservationStatus.CheckedIn)
                     return new ResponseDTO<ReservationGetDTO>("Reservation must be CheckedIn before CheckedOut", null);
                 reservation.ReservationStatus = ReservationStatus.CheckedOut;
+                if(reservation.Room == null)
+                    return new ResponseDTO<ReservationGetDTO>("Room not found", null);
                 reservation.Room.IsAvailable = true;
                 var resultDTO = mapper.Map<ReservationGetDTO>(reservation);
+                resultDTO.UserName = claims.FindFirstValue(ClaimTypes.Name) ?? "No Username";
                 unitOfWork.Reservations.Update(reservation);
-                unitOfWork.Rooms.Update(reservation.Room);
                 await unitOfWork.CompleteAsync();
                 return new ResponseDTO<ReservationGetDTO>("Reservation CheckedOut", resultDTO);
             }
@@ -293,7 +288,7 @@ namespace HRS_ServiceLayer.Services.Reservations
             var pricePerNight = room.PricePerNight;
             var numberOfDays = reservation.CheckOutDate.Day - reservation.CheckInDate.Day;
             var totalCost = (decimal)pricePerNight * numberOfDays;
-            return ApplyOfferToReservationPaymentAsync(reservation,room, totalCost);
+            return ApplyOfferToReservationPaymentAsync(reservation, room, totalCost);
         }
         private async Task<decimal> ApplyOfferToReservationPaymentAsync(Reservation reservation, Room room, decimal totalCost)
         {

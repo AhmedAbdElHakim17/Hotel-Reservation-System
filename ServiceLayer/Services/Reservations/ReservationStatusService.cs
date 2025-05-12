@@ -30,7 +30,6 @@ namespace HRS_ServiceLayer.Services.Reservations
                 r.Room.IsAvailable = false;
                 logger.LogInformation($"Room Number:{r.Room.RoomNum} is now occupied");
                 unitOfWork.Reservations.Update(r);
-                unitOfWork.Rooms.Update(r.Room);
             }
             await unitOfWork.CompleteAsync();
         }
