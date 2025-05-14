@@ -74,6 +74,8 @@ namespace HRS_ServiceLayer.Services
         {
             try
             {
+                if (await unitOfWork.RoleManager.RoleExistsAsync(roleName))
+                    return new ResponseDTO<RoleDTO>("Role already exists", null);
                 IdentityRole role = new IdentityRole();
                 role.Name = roleName;
                 IdentityResult result = await unitOfWork.RoleManager.CreateAsync(role);
@@ -82,7 +84,7 @@ namespace HRS_ServiceLayer.Services
                     var resultDTO = mapper.Map<RoleDTO>(role);
                     return new ResponseDTO<RoleDTO>("Role Added Successfully", resultDTO);
                 }
-                return new ResponseDTO<RoleDTO>("Adding role process failed", null);
+                return new ResponseDTO<RoleDTO>($"Adding role failed: {string.Join("; ", result.Errors.Select(e => e.Description))}", null);
             }
             catch (Exception ex)
             {
@@ -100,7 +102,8 @@ namespace HRS_ServiceLayer.Services
                     var resultDTO = mapper.Map<UserGetDTO>(user);
                     return new ResponseDTO<UserGetDTO>("User Added Successfully", resultDTO);
                 }
-                return new ResponseDTO<UserGetDTO>("Adding user process failed", null);
+                return new ResponseDTO<UserGetDTO>($"Adding user failed: {string.Join("; ", result.Errors.Select(e => e.Description))}", null);
+
             }
             catch (Exception ex)
             {
@@ -124,7 +127,7 @@ namespace HRS_ServiceLayer.Services
                     resultDTO.Role = role.Name;
                     return new ResponseDTO<UserGetDTO>("Role Added To User Successfully", resultDTO);
                 }
-                return new ResponseDTO<UserGetDTO>("Adding role process failed", null);
+                return new ResponseDTO<UserGetDTO>($"Adding role to user failed: {string.Join("; ", result.Errors.Select(e => e.Description))}", null);
             }
             catch (Exception ex)
             {

@@ -63,7 +63,7 @@ namespace HRS_ServiceLayer.Services.Offers
                     return new ResponseDTO<OfferDTO>("offer not found", null);
 
                 if (offerDTO.Id != id)
-                    return new ResponseDTO<OfferDTO>("ID mismatch", null);
+                    return new ResponseDTO<OfferDTO>("The provided offer ID does not match the route ID.", null);
 
                 mapper.Map(offerDTO, offer);
                 unitOfWork.Offers.Update(offer);
@@ -90,7 +90,7 @@ namespace HRS_ServiceLayer.Services.Offers
                 await unitOfWork.CompleteAsync();
 
                 var resultDTO = mapper.Map<OfferDTO>(offer);
-                return new ResponseDTO<OfferDTO>("Room deleted successfully", resultDTO);
+                return new ResponseDTO<OfferDTO>("Offer deleted successfully", resultDTO);
             }
             catch (Exception ex)
             {

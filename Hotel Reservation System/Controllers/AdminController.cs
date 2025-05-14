@@ -56,7 +56,7 @@ namespace HRS.Presentation.Controllers
                 return StatusCode(500, "Internal Server Error");
             }
         }
-        [HttpGet("GetUserById")]
+        [HttpGet("GetUserById/{userId}")]
         public async Task<IActionResult> GetUserById(string userId)
         {
             try
@@ -150,7 +150,7 @@ namespace HRS.Presentation.Controllers
                 return StatusCode(500, "Internal Server Error");
             }
         }
-        [HttpDelete("DeleteRole")]
+        [HttpDelete("DeleteRole/{roleId}")]
         public async Task<IActionResult> DeleteRole(string roleId)
         {
             try
@@ -166,7 +166,7 @@ namespace HRS.Presentation.Controllers
                 return StatusCode(500, "Internal Server Error");
             }
         }
-        [HttpDelete("DeleteUser")]
+        [HttpDelete("DeleteUser/{userId}")]
         public async Task<IActionResult> DeleteUser(string userId)
         {
             try

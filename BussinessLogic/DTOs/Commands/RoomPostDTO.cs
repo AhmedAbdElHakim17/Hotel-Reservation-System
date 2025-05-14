@@ -16,7 +16,7 @@ namespace HRS_BussinessLogic.DTOs.Commands
         public double PricePerNight { get; set; }
         public bool IsAvailable { get; set; }
         [Required(ErrorMessage ="Image Url is required")]
-        [RegularExpression(@"\w+\.(jpg|png)")]
+        //[RegularExpression(@"\w+\.(jpg|png)")]
         public string ImageUrl { get; set; }
         [MaxLength(500, ErrorMessage = "Facilities description cannot exceed 500 characters.")]
         public string Facilities { get; set; }

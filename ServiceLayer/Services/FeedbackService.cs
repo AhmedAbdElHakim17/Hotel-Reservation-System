@@ -68,8 +68,6 @@ namespace HRS_ServiceLayer.Services
                 if (Exist != null)
                     return new ResponseDTO<FeedbackDTO>("This Reservation has a feedback already, You can Update the feedback",null);
                 var feedback = mapper.Map<Feedback>(feedbackDTO);
-                if (feedback == null)
-                    return new ResponseDTO<FeedbackDTO>("Error while Mapping", null);
                 feedback.UserId = user.Id;
                 await unitOfWork.Feedbacks.AddAsync(feedback);
                 await unitOfWork.CompleteAsync();

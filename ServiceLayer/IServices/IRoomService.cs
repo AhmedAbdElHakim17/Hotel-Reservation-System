@@ -1,4 +1,5 @@
-﻿using HRS_BussinessLogic.DTOs.Queries;
+﻿using HRS_BussinessLogic.DTOs.Commands;
+using HRS_BussinessLogic.DTOs.Queries;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,8 +13,8 @@ namespace HRS_ServiceLayer.IServices
         Task<ResponseDTO<List<RoomGetDTO>>> GetAllRoomsAsync();
         Task<ResponseDTO<List<RoomGetDTO>>> GetAvailableRoomsAsync(DateTime from, DateTime to);
         Task<ResponseDTO<RoomGetDTO>> GetRoomByIdAsync(int id);
-        Task<ResponseDTO<RoomGetDTO>> AddRoomAsync(RoomGetDTO roomDTO);
-        Task<ResponseDTO<RoomGetDTO>> UpdateRoomAsync(int id, RoomGetDTO roomDTO);
+        Task<ResponseDTO<RoomPostDTO>> AddRoomAsync(RoomPostDTO roomDTO);
+        Task<ResponseDTO<RoomPostDTO>> UpdateRoomAsync(int id, RoomPostDTO roomDTO);
         Task<ResponseDTO<RoomGetDTO>> DeleteRoomAsync(int id);
     }
 }

@@ -29,10 +29,15 @@ namespace HRS_ServiceLayer.Services.Reservations
                      );
             foreach (var r in expiredRes)
             {
+                var previosStatus = r.ReservationStatus;
                 r.ReservationStatus = ReservationStatus.Expired;
-                if (r.ReservationStatus == ReservationStatus.CheckedIn && r.Room != null)
+                if (previosStatus == ReservationStatus.CheckedIn && r.Room != null)
+                {
                     r.Room.IsAvailable = true;
+                    unitOfWork.Rooms.Update(r.Room);
+                }
                 logger.LogInformation($"Reservation Status with id {r.Id} is Expired");
+                unitOfWork.Reservations.Update(r);
             }
             await unitOfWork.CompleteAsync();
         }

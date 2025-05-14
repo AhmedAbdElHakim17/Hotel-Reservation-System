@@ -23,10 +23,10 @@ namespace HRS_ServiceLayer.Services
         public async Task<ResponseDTO<RoleDTO>> GetUserRoleAsync(ClaimsPrincipal claims)
         {
             var user = await GetCurrentUserAsync(claims);
-            if (user == null) 
+            if (user == null)
                 return new ResponseDTO<RoleDTO>("User Not found", null);
             var role = (await unitOfWork.UserManager.GetRolesAsync(user)).FirstOrDefault();
-            var roleVM = new RoleDTO { Id=null, Name = role, NormalizedName = role.ToUpper()};
+            var roleVM = new RoleDTO { Id = null, Name = role, NormalizedName = role.ToUpper() };
             return new ResponseDTO<RoleDTO>("role retrieved successfully", roleVM);
         }
 
@@ -35,42 +35,38 @@ namespace HRS_ServiceLayer.Services
             try
             {
                 var user = await unitOfWork.UserManager.FindByEmailAsync(loginDTO.Email);
-                if (user == null)
-                    return new ResponseDTO<AuthDTO>("user not found", null);
-                bool found = await unitOfWork.UserManager.CheckPasswordAsync(user, loginDTO.Password);
-                if (found == true)
+                if (user == null || !await unitOfWork.UserManager.CheckPasswordAsync(user, loginDTO.Password))
+                    return new ResponseDTO<AuthDTO>("Invalid email or password", null);
+
+                List<Claim> Claims = new List<Claim>();
+                Claims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
+
+                Claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id));
+                Claims.Add(new Claim(ClaimTypes.Name, user.UserName));
+                Claims.Add(new Claim(ClaimTypes.Email, user.Email));
+
+                var Roles = await unitOfWork.UserManager.GetRolesAsync(user);
+                foreach (var Role in Roles)
                 {
-                    List<Claim> Claims = new List<Claim>();
-                    Claims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
-
-                    Claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id));
-                    Claims.Add(new Claim(ClaimTypes.Name, user.UserName));
-                    Claims.Add(new Claim(ClaimTypes.Email, user.Email));
-
-                    var Roles = await unitOfWork.UserManager.GetRolesAsync(user);
-                    foreach (var Role in Roles)
-                    {
-                        Claims.Add(new Claim(ClaimTypes.Role, Role));
-                    }
-                    SymmetricSecurityKey SignInKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:SecretKey"]));
-
-                    SigningCredentials SignInCreds = new SigningCredentials(SignInKey, SecurityAlgorithms.HmacSha256);
-
-                    JwtSecurityToken token = new JwtSecurityToken(
-                         issuer: configuration["JWT:IssuerIP"],
-                         audience: configuration["JWT:AudienceIP"],
-                         expires: DateTime.Now.AddHours(1),
-                         claims: Claims,
-                         signingCredentials: SignInCreds
-                         );
-                    var authDTO = new AuthDTO
-                    {
-                        Token = new JwtSecurityTokenHandler().WriteToken(token),
-                        Expiration = DateTime.Now.AddHours(1)
-                    };
-                    return new ResponseDTO<AuthDTO>("User's Login succeeded",authDTO);
+                    Claims.Add(new Claim(ClaimTypes.Role, Role));
                 }
-                return new ResponseDTO<AuthDTO>("User not found", null);
+                SymmetricSecurityKey SignInKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:SecretKey"]));
+
+                SigningCredentials SignInCreds = new SigningCredentials(SignInKey, SecurityAlgorithms.HmacSha256);
+
+                JwtSecurityToken token = new JwtSecurityToken(
+                     issuer: configuration["JWT:IssuerIP"],
+                     audience: configuration["JWT:AudienceIP"],
+                     expires: DateTime.Now.AddHours(1),
+                     claims: Claims,
+                     signingCredentials: SignInCreds
+                     );
+                var authDTO = new AuthDTO
+                {
+                    Token = new JwtSecurityTokenHandler().WriteToken(token),
+                    Expiration = DateTime.Now.AddHours(1)
+                };
+                return new ResponseDTO<AuthDTO>("User's Login succeeded", authDTO);
             }
             catch (Exception ex)
             {
@@ -96,7 +92,7 @@ namespace HRS_ServiceLayer.Services
                         return new ResponseDTO<UserGetDTO>("User registered successfully", resultDTO);
                     }
                 }
-                return new ResponseDTO<UserGetDTO>("User's register process failed", null);
+                return new ResponseDTO<UserGetDTO>($"User's register process failed: {string.Join(", ", result.Errors.Select(e => e.Description))}", null);
             }
             catch (Exception ex)
             {

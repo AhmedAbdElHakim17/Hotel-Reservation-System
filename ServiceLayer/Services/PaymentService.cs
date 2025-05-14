@@ -37,7 +37,7 @@ namespace HRS_ServiceLayer.Services
                 await unitOfWork.Payments.AddAsync(payment);
                 await unitOfWork.CompleteAsync();
 
-                var resultDTO = mapper.Map<PaymentDTO>(paymentDTO);
+                var resultDTO = mapper.Map<PaymentDTO>(payment);
                 return new ResponseDTO<PaymentDTO>("Payment added successfully", resultDTO);
             }
             catch (Exception ex)

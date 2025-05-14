@@ -1,8 +1,6 @@
 ﻿using HRS_BussinessLogic.DTOs.Commands;
-using HRS_BussinessLogic.Models;
 using HRS_Presentation.Middlewares;
 using HRS_ServiceLayer.IServices;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HRS.Presentation.Controllers
@@ -18,7 +16,7 @@ namespace HRS.Presentation.Controllers
             try
             {
                 var response = await userService.RegisterAsync(registerDTO);
-                if (response == null)
+                if (!response.IsSuccess)
                     return BadRequest(response.Message);
                 return Ok(response);
             }
@@ -34,7 +32,7 @@ namespace HRS.Presentation.Controllers
             try
             {
                 var response = await userService.LoginAsync(loginDTO);
-                if (response == null) return BadRequest(response.Message);
+                if (!response.IsSuccess) return BadRequest(response.Message);
                 return Ok(response);
             }
             catch (Exception ex)
@@ -49,7 +47,7 @@ namespace HRS.Presentation.Controllers
             try
             {
                 var response = await userService.GetUserRoleAsync(User);
-                if (response == null) return BadRequest(response.Message);
+                if (!response.IsSuccess) return BadRequest(response.Message);
                 return Ok(response);
 
             }

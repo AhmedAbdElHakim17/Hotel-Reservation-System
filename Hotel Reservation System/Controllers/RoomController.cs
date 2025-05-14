@@ -1,4 +1,5 @@
-﻿using HRS_BussinessLogic.DTOs.Queries;
+﻿using HRS_BussinessLogic.DTOs.Commands;
+using HRS_BussinessLogic.DTOs.Queries;
 using HRS_Presentation.Middlewares;
 using HRS_ServiceLayer.IServices;
 using Microsoft.AspNetCore.Authorization;
@@ -60,7 +61,7 @@ namespace HRS.Presentation.Controllers
 
         [HttpPost("Add")]
         [Authorize(Roles = "Admin,HotelStaff")]
-        public async Task<IActionResult> Add(RoomGetDTO roomDTO)
+        public async Task<IActionResult> Add(RoomPostDTO roomDTO)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
             try
@@ -78,7 +79,7 @@ namespace HRS.Presentation.Controllers
 
         [HttpPut("Update/{id:int}")]
         [Authorize(Roles = "Admin,HotelStaff")]
-        public async Task<IActionResult> Update(int id, RoomGetDTO roomDTO)
+        public async Task<IActionResult> Update(int id, RoomPostDTO roomDTO)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
             try

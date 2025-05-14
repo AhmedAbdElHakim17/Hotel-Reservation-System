@@ -3,6 +3,7 @@ using HRS_DataAccess.Models;
 using HRS_DataAccess;
 using HRS_ServiceLayer.IServices;
 using HRS_BussinessLogic.DTOs.Queries;
+using HRS_BussinessLogic.DTOs.Commands;
 
 namespace HRS_ServiceLayer.Services
 {
@@ -49,36 +50,36 @@ namespace HRS_ServiceLayer.Services
             return new ResponseDTO<RoomGetDTO>("Room retrieved successfully", roomDTO);
         }
 
-        public async Task<ResponseDTO<RoomGetDTO>> AddRoomAsync(RoomGetDTO roomDTO)
+        public async Task<ResponseDTO<RoomPostDTO>> AddRoomAsync(RoomPostDTO roomDTO)
         {
             var room = mapper.Map<Room>(roomDTO);
             await unitOfWork.Rooms.AddAsync(room);
             await unitOfWork.CompleteAsync();
 
-            var resultDTO = mapper.Map<RoomGetDTO>(room);
-            return new ResponseDTO<RoomGetDTO>("Room added successfully", resultDTO);
+            var resultDTO = mapper.Map<RoomPostDTO>(room);
+            return new ResponseDTO<RoomPostDTO>("Room added successfully", resultDTO);
         }
 
-        public async Task<ResponseDTO<RoomGetDTO>> UpdateRoomAsync(int id, RoomGetDTO roomDTO)
+        public async Task<ResponseDTO<RoomPostDTO>> UpdateRoomAsync(int id, RoomPostDTO roomDTO)
         {
-            var room = await unitOfWork.Rooms.FindAsync(r => r.Id == id);
+            var room = await unitOfWork.Rooms.GetByIdAsync(id);
             if (room == null)
-                return new ResponseDTO<RoomGetDTO>("Room not found", null);
+                return new ResponseDTO<RoomPostDTO>("Room not found", null);
 
             if (roomDTO.Id != id)
-                return new ResponseDTO<RoomGetDTO>("ID mismatch", null);
+                return new ResponseDTO<RoomPostDTO>("ID mismatch", null);
 
             mapper.Map(roomDTO, room);
             unitOfWork.Rooms.Update(room);
             await unitOfWork.CompleteAsync();
 
-            var resultDTO = mapper.Map<RoomGetDTO>(room);
-            return new ResponseDTO<RoomGetDTO>("Room updated successfully", resultDTO);
+            var resultDTO = mapper.Map<RoomPostDTO>(room);
+            return new ResponseDTO<RoomPostDTO>("Room updated successfully", resultDTO);
         }
 
         public async Task<ResponseDTO<RoomGetDTO>> DeleteRoomAsync(int id)
         {
-            var room = await unitOfWork.Rooms.FindAsync(r => r.Id == id);
+            var room = await unitOfWork.Rooms.GetByIdAsync(id);
             if (room == null)
                 return new ResponseDTO<RoomGetDTO>("Room not found", null);
 

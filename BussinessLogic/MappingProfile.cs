@@ -18,22 +18,23 @@ namespace BussinessLogic
             CreateMap<IdentityRole, RoleDTO>().ReverseMap();
             // Rooms
             CreateMap<Room, RoomGetDTO>().ReverseMap();
+            CreateMap<Room, RoomPostDTO>().ReverseMap();
 
             // Reservations
             CreateMap<Reservation, ReservationPostDTO>()
-                .ForMember(dest => dest.RoomNum, src => src.MapFrom(src => src.Room.RoomNum != 0? src.Room.RoomNum : 0 ))
+                .ForMember(dest => dest.RoomNum, src => src.MapFrom(src => src.Room.RoomNum))
                 .ReverseMap();
 
             CreateMap<Reservation, ReservationGetDTO>()
-                .ForMember(dest => dest.RoomNum, src => src.MapFrom(src => src.Room.RoomNum != 0 ? src.Room.RoomNum : 0))
-                .ForMember(dest => dest.UserName, src => src.MapFrom(src => src.User.UserName ?? "No UserName"))
+                .ForMember(dest => dest.RoomNum, src => src.MapFrom(src => src.Room.RoomNum))
+                .ForMember(dest => dest.UserName, src => src.MapFrom(src => src.User.UserName != null ? src.User.UserName : null))
                 .ReverseMap();
 
             CreateMap<ReservationGetDTO, ReservationPostDTO>()
                 .ReverseMap();
             // Feedback
             CreateMap<Feedback, FeedbackDTO>()
-                .ForMember(dest => dest.UserName, src => src.MapFrom(src => src.User.UserName ?? "No UserName"))
+                .ForMember(dest => dest.UserName, src => src.MapFrom(src => src.User.UserName != null ? src.User.UserName : null))
                 .ReverseMap();
             // Offer
             CreateMap<Offer, OfferDTO>().ReverseMap();
