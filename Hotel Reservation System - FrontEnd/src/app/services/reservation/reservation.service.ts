@@ -14,128 +14,41 @@ export class ReservationService {
   isLoading: boolean = false;
   constructor(private httpClient: HttpClient) { }
   getAllReservations(): Observable<ApiResponse<IReservation[]>> {
-    return this.httpClient.get<ApiResponse<IReservation[]>>(`${this.apiBaseUrl}/All`).pipe(
-      map(res => res),
-      catchError(error => {
-        return of({
-          message: error.message,
-          data: [],
-          isSuccess: false
-        });
-      }))
+    return this.httpClient.get<ApiResponse<IReservation[]>>(`${this.apiBaseUrl}/All`);
   }
   getAllUpcomingReservations() {
-    return this.httpClient.get<ApiResponse<IReservation[]>>(`${this.apiBaseUrl}/AllUpcoming`).pipe(
-      map(res => res),
-      catchError(error => {
-        return of({
-          message: error.message,
-          data: [],
-          isSuccess: false
-        });
-      }))
+    return this.httpClient.get<ApiResponse<IReservation[]>>(`${this.apiBaseUrl}/AllUpcoming`);
   }
   getMyUpcomingReservations() {
-    return this.httpClient.get<ApiResponse<IReservation[]>>(`${this.apiBaseUrl}/MyOwn-Upcoming`).pipe(
-      map(res => res),
-      catchError(error => {
-        return of({
-          message: error.message,
-          data: [],
-          isSuccess: false
-        });
-      }))
+    return this.httpClient.get<ApiResponse<IReservation[]>>(`${this.apiBaseUrl}/MyOwn-Upcoming`);
   }
   getMyReservations() {
-    return this.httpClient.get<ApiResponse<IReservation[]>>(`${this.apiBaseUrl}/MyOwn`).pipe(
-      map(res => res),
-      catchError(error => {
-        return of({
-          message: error.message,
-          data: [],
-          isSuccess: false
-        });
-      }))
+    return this.httpClient.get<ApiResponse<IReservation[]>>(`${this.apiBaseUrl}/MyOwn`);
+  }
+  getReservationById(id: number) {
+    return this.httpClient.get<ApiResponse<IReservation>>(`${this.apiBaseUrl}/GetById/${id}`);
   }
   addReservation(data: IReservation): Observable<ApiResponse<IReservation>> {
-    return this.httpClient.post<ApiResponse<IReservation>>(`${this.apiBaseUrl}/Add`, data).pipe(
-      map(res => res),
-      catchError(error => {
-        return of({
-          message: error.message,
-          data: error.data,
-          isSuccess: error.isSuccess
-        });
-      })
-    )
+    return this.httpClient.post<ApiResponse<IReservation>>(`${this.apiBaseUrl}/Add`, data);
   }
   updateReservation(id: number, data: IReservation): Observable<ApiResponse<IReservation>> {
-    return this.httpClient.put<ApiResponse<IReservation>>(`${this.apiBaseUrl}/Update/${id}`, data).pipe(
-      map(res => res),
-      catchError(error => {
-        return of({
-          message: error.message,
-          data: error.data,
-          isSuccess: error.isSuccess
-        });
-      })
-    )
+    return this.httpClient.put<ApiResponse<IReservation>>(`${this.apiBaseUrl}/Update/${id}`, data);
   }
-
   cancelReservation(id: number): Observable<ApiResponse<IReservation>> {
-    return this.httpClient.delete<ApiResponse<IReservation>>(`${this.apiBaseUrl}/Cancel/${id}`, {}).pipe(
-      map(res => res),
-      catchError(error => {
-        return of({
-          message: error.message,
-          data: error.data,
-          isSuccess: error.isSuccess
-        });
-      })
-    )
+    return this.httpClient.delete<ApiResponse<IReservation>>(`${this.apiBaseUrl}/Cancel/${id}`);
   }
-
   confirmReservation(id: number): Observable<ApiResponse<IReservation>> {
-    return this.httpClient.patch<ApiResponse<IReservation>>(`${this.apiBaseUrl}/Confirm/${id}`, {}).pipe(
-      map(res => res),
-      catchError(error => {
-        return of({
-          message: error.message,
-          data: error.data,
-          isSuccess: error.isSuccess
-        });
-      })
-    )
+    return this.httpClient.patch<ApiResponse<IReservation>>(`${this.apiBaseUrl}/Confirm/${id}`, {});
   }
-
   checkInReservation(id: number): Observable<ApiResponse<IReservation>> {
-    return this.httpClient.patch<ApiResponse<IReservation>>(`${this.apiBaseUrl}/CheckIn/${id}`, {}).pipe(
-      map(res => res),
-      catchError(error => {
-        return of({
-          message: error.message,
-          data: error.data,
-          isSuccess: error.isSuccess
-        });
-      })
-    )
+    return this.httpClient.patch<ApiResponse<IReservation>>(`${this.apiBaseUrl}/CheckIn/${id}`, {});
   }
   checkOutReservation(id: number): Observable<ApiResponse<IReservation>> {
-    return this.httpClient.patch<ApiResponse<IReservation>>(`${this.apiBaseUrl}/CheckOut/${id}`, {}).pipe(
-      map(res => res),
-      catchError(error => {
-        return of({
-          message: error.message,
-          data: error.data,
-          isSuccess: error.isSuccess
-        });
-      })
-    )
+    return this.httpClient.patch<ApiResponse<IReservation>>(`${this.apiBaseUrl}/CheckOut/${id}`, {});
   }
-
   downloadPdf(id: number): Observable<Blob> {
     return this.httpClient.get(`${this.apiBaseUrl}/invoice-pdf/${id}`, {
-      responseType: 'blob', // Important for binary data
+      responseType: 'blob',
       headers: new HttpHeaders({
         'Accept': 'application/pdf'
       })

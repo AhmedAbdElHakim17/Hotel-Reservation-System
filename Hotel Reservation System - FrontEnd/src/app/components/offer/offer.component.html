@@ -1,40 +1,111 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="#">Navbar</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="#">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Link</a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        Dropdown
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" href="#">Action</a></li>
-                        <li><a class="dropdown-item" href="#">Another action</a></li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-                        <li><a class="dropdown-item" href="#">Something else here</a></li>
-                    </ul>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
-                </li>
-            </ul>
-            <form class="d-flex">
-                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success" type="submit">Search</button>
-            </form>
-        </div>
+<div class="container mt-4">
+  <div class="row mb-4">
+    <div class="col">
+      <h2 class="mb-3">
+        <i class="fas fa-tag me-2"></i>Special Offers
+      </h2>
+      <button *ngIf="role === 'Admin'" class="btn btn-primary" (click)="openAddModal()">
+        <i class="fas fa-plus me-1"></i> Add New Offer
+      </button>
     </div>
-</nav>
+  </div>
+
+  <!-- Loading state -->
+  <div *ngIf="!offers" class="text-center my-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2">Loading offers...</p>
+  </div>
+
+  <!-- No offers state -->
+  <div *ngIf="offers && offers.length === 0" class="alert alert-info">
+    No special offers available at the moment.
+  </div>
+
+  <!-- Offers list -->
+  <div *ngIf="offers && offers.length > 0" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    <div class="col" *ngFor="let offer of offers">
+      <div class="card h-100 shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h5 class="card-title mb-0">{{ offer.title }}</h5>
+        </div>
+        <div class="card-body">
+          <p class="card-text">{{ offer.description }}</p>
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="badge bg-success">{{ offer.discount }}% OFF</span>
+            <span class="badge bg-info">{{ offer.roomType }}</span>
+          </div>
+          <div class="mt-3">
+            <small class="text-muted">
+              Valid from {{ offer.startDate | date }} to {{ offer.endDate | date }}
+            </small>
+          </div>
+        </div>
+        <div class="card-footer bg-transparent" *ngIf="role === 'Admin'">
+          <div class="d-flex justify-content-end gap-2">
+            <button class="btn btn-sm btn-outline-warning" (click)="openEditModal(offer)">
+              <i class="fas fa-edit"></i> Edit
+            </button>
+            <button class="btn btn-sm btn-outline-danger" (click)="deleteOffer(offer.id)">
+              <i class="fas fa-trash-alt"></i> Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for adding/editing offers -->
+<div *ngIf="showModal" class="modal fade show d-block" style="background-color: rgba(0,0,0,0.5);">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form (ngSubmit)="submitForm()">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ isEditMode ? 'Edit Offer' : 'Add Offer' }}</h5>
+          <button type="button" class="btn-close" (click)="closeModal()"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Title</label>
+            <input type="text" class="form-control" [(ngModel)]="selectedOffer.title" name="title" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea class="form-control" [(ngModel)]="selectedOffer.description" name="description" rows="3"
+              required></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Discount (%)</label>
+            <input type="number" class="form-control" [(ngModel)]="selectedOffer.discount" name="discount" min="1"
+              max="100" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Room Type</label>
+            <select class="form-select" [(ngModel)]="selectedOffer.roomType" name="roomType" required>
+              <option value="" disabled selected>Select room type</option>
+              <option *ngFor="let type of roomTypes" [value]="type">{{ type }}</option>
+            </select>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Start Date</label>
+              <input type="date" class="form-control" [(ngModel)]="selectedOffer.startDate" name="startDate" required
+                [min]="today | date:'yyyy-MM-dd'">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">End Date</label>
+              <input type="date" class="form-control" [(ngModel)]="selectedOffer.endDate" name="endDate" required
+                [min]="selectedOffer.startDate | date:'yyyy-MM-dd'">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">{{ isEditMode ? 'Update' : 'Add' }} Offer</button>
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

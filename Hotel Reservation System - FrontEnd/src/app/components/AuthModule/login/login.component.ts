@@ -7,6 +7,7 @@ import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { IUser } from '../../../models/IUser';
 import { finalize } from 'rxjs';
 import Swal from 'sweetalert2';
+import { ErrorMessageService } from '../../../services/error/error.service';
 
 @Component({
   selector: 'app-login',
@@ -20,26 +21,21 @@ export class LoginComponent {
   isLoading = false;
   error = '';
 
-  constructor(private auth: AuthService, private router: Router) { }
+  constructor(private auth: AuthService, private router: Router, private errorService: ErrorMessageService) { }
 
   onSubmit() {
     this.isLoading = true;
     this.error = '';
-
     this.auth.login(this.user).pipe(
       finalize(() => this.isLoading = false)
     ).subscribe({
-      next: (res) => {
-
-        if (res.isSuccess) {
-          this.auth.startAutoLogoutWatcher(); // Optional
-          this.router.navigate(['/Home']);
-        } else {
-          Swal.fire('Oops!', 'Invalid Email or Password', 'error');
-        }
+      next: () => {
+        this.auth.startAutoLogoutWatcher(); // Optional
+        this.auth.notifyAuthChanged();
+        this.router.navigate(['/Home']);
       },
       error: (err) => {
-        Swal.fire('Oops!', err.error?.message || 'Login failed', 'error');
+        this.errorService.showErrorMessage(err);
       }
     });
   }

@@ -1,0 +1,39 @@
+footer {
+  margin-top: 2rem;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+}
+
+footer h5 {
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #1e3c72;
+}
+
+footer ul li {
+  padding: 0.3rem 0;
+}
+
+footer a {
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+footer a:hover {
+  color: #1e3c72 !important;
+  text-decoration: underline;
+}
+
+.btn-floating {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.btn-floating:hover {
+  background-color: #1e3c72;
+  color: white;
+}

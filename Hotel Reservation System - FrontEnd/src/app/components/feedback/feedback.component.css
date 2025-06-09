@@ -1,0 +1,273 @@
+/* Container Styles */
+.feedback-management-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+/* Header Styles */
+.management-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.header-icon {
+    font-size: 36px;
+    width: 36px;
+    height: 36px;
+    margin-right: 1rem;
+    color: #4CAF50;
+}
+
+.management-title {
+    font-weight: 500;
+    margin: 0;
+    color: #333;
+}
+
+/* Status Containers */
+.status-container {
+    min-height: 300px;
+    position: relative;
+}
+
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.loading-text {
+    margin-top: 1rem;
+    color: #666;
+}
+
+.error-state {
+    background: #FFF3F3;
+    border-radius: 8px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.error-content {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.error-icon {
+    color: #F44336;
+    margin-right: 0.5rem;
+}
+
+.error-message {
+    color: #D32F2F;
+    font-weight: 500;
+}
+
+.retry-button {
+    margin-top: 1rem;
+}
+
+/* Feedback Content */
+.feedback-summary {
+    display: flex;
+    justify-content: space-around;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    border-radius: 8px;
+    background: #f5f5f5;
+}
+
+.summary-item {
+    display: flex;
+    align-items: center;
+    color: #555;
+}
+
+.summary-item mat-icon {
+    margin-right: 0.5rem;
+    color: #4CAF50;
+}
+
+/* Feedback Cards */
+.feedback-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+}
+
+.feedback-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-radius: 12px !important;
+}
+
+.feedback-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+.user-avatar {
+    background-color: #4CAF50;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-weight: bold;
+}
+
+.rating-stars mat-icon {
+    color: #FFC107;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
+
+.reservation-id {
+    color: #666;
+    font-size: 0.8rem;
+}
+
+.feedback-comment {
+    color: #333;
+    line-height: 1.6;
+    margin: 1rem 0;
+}
+
+.feedback-meta {
+    display: flex;
+    justify-content: space-around;
+    align-items: end;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #eee;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    margin-left: auto;
+}
+
+.edit-button {
+    border-color: #3f51b5;
+}
+
+.delete-button {
+    border-color: #f44336;
+}
+
+/* Make buttons more compact on small screens */
+@media (max-width: 600px) {
+    .action-buttons {
+        flex-direction: column;
+        gap: 0.3rem;
+    }
+
+    .edit-button,
+    .delete-button {
+        min-width: auto;
+        padding: 0 8px;
+    }
+}
+
+.timestamp {
+    display: flex;
+    align-items: center;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.timestamp mat-icon {
+    font-size: 18px;
+    margin-right: 0.3rem;
+    color: #666;
+}
+
+.delete-button {
+    margin-left: auto;
+}
+
+/* Empty State */
+.empty-state {
+    padding: 3rem 2rem;
+    text-align: center;
+    border-radius: 12px;
+    background: #f9f9f9;
+}
+
+.empty-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: #9E9E9E;
+    margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+    color: #555;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+    color: #777;
+    margin-bottom: 1.5rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .feedback-list {
+        grid-template-columns: 1fr;
+    }
+
+    .feedback-summary {
+        flex-direction: column;
+        gap: 1rem;
+    }
+}
+/* Header and Filter Buttons */
+.management-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .management-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .filter-buttons {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .filter-buttons button {
+        flex: 1;
+    } }

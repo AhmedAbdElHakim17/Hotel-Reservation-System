@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { IRegister } from '../../../models/IRegister';
 import { AuthService } from '../../../services/authentication/Auth.service';
+import { ErrorMessageService } from '../../../services/error/error.service';
 
 @Component({
   selector: 'app-register',
@@ -16,7 +17,7 @@ export class RegisterComponent {
   userData: IRegister = {} as IRegister;
   isLoading = false;
   error = '';
-  constructor(private auth: AuthService, private router: Router) { }
+  constructor(private auth: AuthService, private router: Router, private errorService: ErrorMessageService) { }
 
   onSubmit() {
     this.isLoading = true;
@@ -28,8 +29,7 @@ export class RegisterComponent {
           this.router.navigate(['/login']);
       },
       error: (err) => {
-        alert(err.message || 'Registration failed');
-        this.isLoading = false;
+        this.errorService.showErrorMessage(err);
       }
     });
   }

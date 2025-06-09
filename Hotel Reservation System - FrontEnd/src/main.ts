@@ -9,11 +9,8 @@ import { routes } from './app/app.routes';
 
 bootstrapApplication(AppComponent, {
   providers: [
-    // Essential providers for standalone apps:
-    provideRouter(routes), // If using router
-    provideAnimations(),   // If using Material/animations
-
-    // Include your appConfig providers
+    provideRouter(routes),
+    provideAnimations(),
     ...(appConfig?.providers || [])
   ]
 })

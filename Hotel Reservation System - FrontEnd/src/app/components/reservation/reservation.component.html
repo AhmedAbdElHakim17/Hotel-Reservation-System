@@ -1,0 +1,377 @@
+<div class="container-fluid reservation-dashboard py-4 px-lg-5">
+    <!-- Header Section -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-5">
+        <div>
+            <h1 class="display-5 fw-bold text-gradient-primary mb-2">
+                <i class="fas fa-calendar-check me-2"></i>Reservation Dashboard
+            </h1>
+            <p class="text-muted">Manage and track all reservations in one place</p>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2 mt-3 mt-md-0">
+            <button class="btn btn-success btn-lg px-4" (click)="LoadUpcomingReservation()">
+                <i class="fas fa-clock me-2"></i>Upcoming
+            </button>
+            <button class="btn btn-outline-primary btn-lg px-4" (click)="LoadPreviousReservations()">
+                <i class="fas fa-history me-2"></i>History
+            </button>
+        </div>
+    </div>
+
+    <!-- Stats Overview -->
+    <div class="row row-cols-lg-3 mb-5 ">
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card stat-card bg-primary bg-opacity-10 border-0 h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase text-muted mb-2">Total Reservations</h6>
+                            <h2 class="mb-0">{{ Reservations.length }}</h2>
+                        </div>
+                        <div class="icon-circle bg-primary-light">
+                            <i class="fas fa-list text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card stat-card bg-primary bg-opacity-10 border-0 h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase text-muted mb-2">Pending</h6>
+                            <h2 class="mb-0">{{ pendingRes.length }}</h2>
+                        </div>
+                        <div class="icon-circle bg-primary-light">
+                            <i class="fas fa-list text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card stat-card bg-primary bg-opacity-10 border-0 h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase text-muted mb-2">Confirmed</h6>
+                            <h2 class="mb-0">{{ confirmedRes.length }}</h2>
+                        </div>
+                        <div class="icon-circle bg-primary-light">
+                            <i class="fas fa-list text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card stat-card bg-primary bg-opacity-10 border-0 h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase text-muted mb-2">CheckedOut</h6>
+                            <h2 class="mb-0">{{ checkedOutRes.length }}</h2>
+                        </div>
+                        <div class="icon-circle bg-primary-light">
+                            <i class="fas fa-list text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card stat-card bg-primary bg-opacity-10 border-0 h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase text-muted mb-2">Cancelled</h6>
+                            <h2 class="mb-0">{{ cancelledRes.length }}</h2>
+                        </div>
+                        <div class="icon-circle bg-primary-light">
+                            <i class="fas fa-list text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card stat-card bg-primary bg-opacity-10 border-0 h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase text-muted mb-2">CheckedIn</h6>
+                            <h2 class="mb-0">{{ checkedInRes.length }}</h2>
+                        </div>
+                        <div class="icon-circle bg-primary-light">
+                            <i class="fas fa-list text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card stat-card bg-primary bg-opacity-10 border-0 h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase text-muted mb-2">Expired</h6>
+                            <h2 class="mb-0">{{ expiredRes.length }}</h2>
+                        </div>
+                        <div class="icon-circle bg-primary-light">
+                            <i class="fas fa-list text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
+        <div class="col" *ngFor="let skeleton of [1,2,3,4]">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body">
+                    <ngx-skeleton-loader count="3" [appearance]="'line'" [theme]="{
+                height: '15px',
+                borderRadius: '4px',
+                marginBottom: '10px'
+              }">
+                    </ngx-skeleton-loader>
+                    <div class="d-flex justify-content-between mt-3">
+                        <ngx-skeleton-loader [appearance]="'circle'" [theme]="{ width: '40px', height: '40px' }">
+                        </ngx-skeleton-loader>
+                        <ngx-skeleton-loader [appearance]="'line'" [theme]="{ width: '80px', height: '40px' }">
+                        </ngx-skeleton-loader>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reservations Grid -->
+    <div *ngIf="!isLoading && Reservations.length > 0"
+        class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-3 g-4">
+        <div *ngFor="let reservation of Reservations" class="col">
+            <div class="card h-100 border-0 shadow-sm hover-effect">
+                <div class="card-header bg-white border-bottom-0 pb-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="badge rounded-pill mb-2" [ngClass]="{
+                'bg-success': reservation.reservationStatus === 'Confirmed',
+                'bg-warning text-dark': reservation.reservationStatus === 'Pending',
+                'bg-danger': reservation.reservationStatus === 'Cancelled',
+                'bg-info': reservation.reservationStatus === 'CheckedIn',
+                'bg-primary': reservation.reservationStatus === 'CheckedOut',
+                'bg-secondary' : reservation.reservationStatus === 'Expired'
+              }">
+                            {{ reservation.reservationStatus }}
+                        </span>
+                        <span class="text-muted small">{{ reservation.id.toString()| slice:0:8 }}</span>
+                    </div>
+                </div>
+
+                <div class="card-body pt-0">
+                    <div *ngIf="role != 'Guest'" class="guest-info mb-3">
+                        <div class="d-flex align-items-center">
+                            <div
+                                class="avatar-sm bg-light rounded-circle d-flex align-items-center justify-content-center me-2">
+                                <i class="fas fa-user text-muted"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0">{{ reservation.userName }}</h6>
+                                <small class="text-muted">Guest</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="reservation-details">
+                        <div class="detail-item">
+                            <i class="fas fa-door-open text-muted me-2"></i>
+                            <span>Room <strong>#{{ reservation.roomNum }}</strong></span>
+                        </div>
+
+                        <div class="detail-item">
+                            <i class="fas fa-calendar-day text-muted me-2"></i>
+                            <span>{{ reservation.checkInDate | date:'MMM d, y' }}</span>
+                            <i class="fas fa-arrow-right mx-2 text-muted"></i>
+                            <span>{{ reservation.checkOutDate | date:'MMM d, y' }}</span>
+                        </div>
+
+                        <div class="detail-item">
+                            <i class="fas fa-coins text-muted me-2"></i>
+                            <span>{{ reservation.totalAmount | currency }}</span>
+                        </div>
+
+                        <div class="detail-item">
+                            <i class="fas fa-clock text-muted me-2"></i>
+                            <span>Booked on {{ reservation.createdAt | date:'MMM d' }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-white border-top-0 pt-0">
+                    <div class="d-flex justify-content-between">
+                        <!-- Details Button -->
+                        <button class="btn btn-sm btn-outline-secondary" (click)="viewDetails(reservation.id)">
+                            <i class="fas fa-eye me-1"></i> Details
+                        </button>
+                        <!-- Check-in Button -->
+                        <button *ngIf="role == 'Admin' && canCheckIn(reservation)" class="btn btn-sm btn-primary me-2"
+                            (click)="checkIn(reservation.id)">
+                            <i class="fas fa-check me-1"></i> Check-in
+                        </button>
+
+                        <!-- Check-out Button -->
+                        <button *ngIf="role == 'Admin' && reservation.reservationStatus == 'CheckedIn'"
+                            class="btn btn-sm btn-primary me-2" (click)="checkOut(reservation.id)">
+                            <i class="fas fa-check me-1"></i> Check-out
+                        </button>
+
+                        <!-- Pay Button -->
+                        <button *ngIf="role == 'Guest' && reservation.reservationStatus == 'Pending'"
+                            class="btn btn-sm btn-success me-2" (click)="startPayment(reservation)">
+                            <i class="fas fa-credit-card me-1"></i> Pay Now
+                        </button>
+
+                        <!-- Cancel Button -->
+                        <button *ngIf="role == 'Guest' && reservation.reservationStatus === 'Confirmed'"
+                            class="btn btn-sm btn-danger" (click)="Cancel(reservation.id)">
+                            <i class="fas fa-times me-1"></i> Cancel
+                        </button>
+                    </div>
+                    <app-payment class="floating-payment"
+                        *ngIf="showPayment && selectedReservation.id === reservation.id"
+                        [amount]="selectedReservation.totalAmount" [reservationId]="selectedReservation.id"
+                        (completed)="onPaymentComplete($event)">
+                    </app-payment>
+                </div>
+                <!-- Payment Component -->
+                <app-payment class="floating-payment" *ngIf="showPayment && reservation.reservationStatus === 'Paid'"
+                    [amount]="reservation.totalAmount" [reservationId]="reservation.id"
+                    (completed)="onPaymentComplete($event)">
+                </app-payment>
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoading && Reservations?.length === 0" class="empty-state text-center py-5">
+        <div class="empty-icon mb-4">
+            <i class="fas fa-calendar-times fa-3x text-muted"></i>
+        </div>
+        <h4 class="mb-3">No Reservations Found</h4>
+        <p class="text-muted mb-4">You currently don't have any reservations matching your criteria</p>
+        <button class="btn btn-primary">
+            <i class="fas fa-sync-alt me-2"></i>Refresh
+        </button>
+    </div>
+</div>
+<!-- Simple Details Modal -->
+<div class="modal-overlay" *ngIf="isDetailModalOpen" (click)="isDetailModalOpen = false">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3>
+                <i class="fas fa-info-circle me-2"></i>
+                Reservation #{{ selectedReservation.id.toString()| slice:0:8 }}
+            </h3>
+            <button class="close-btn" (click)="isDetailModalOpen = false">&times;</button>
+        </div>
+
+        <div class="modal-body">
+            <div class="detail-grid">
+                <!-- Guest Column -->
+                <div class="detail-column">
+                    <h4><i class="fas fa-user me-2"></i>Guest</h4>
+                    <div>
+                        <p><strong>Name:</strong> {{ selectedReservation.userName || 'N/A' }}</p>
+                    </div>
+                    <p><strong>Room:</strong> #{{ selectedReservation.roomNum }}</p>
+                    <p><strong>Status:</strong>
+                        <span class="status-badge p-2 m-1" [ngClass]="{
+                'confirmed': selectedReservation.reservationStatus === 'Confirmed',
+                'pending': selectedReservation.reservationStatus === 'Pending',
+                'checkedOut': selectedReservation.reservationStatus === 'CheckedOut',
+                'cancelled': selectedReservation.reservationStatus === 'Cancelled',
+                'expired' : selectedReservation.reservationStatus === 'Expired'
+              }">
+                            <b>{{ selectedReservation.reservationStatus }}</b>
+                        </span>
+                    </p>
+                </div>
+
+                <!-- Dates Column -->
+                <div class="detail-column">
+                    <h4><i class="fas fa-calendar-alt me-2"></i>Dates</h4>
+                    <p><strong>Check-in:</strong> {{ selectedReservation.checkInDate | date:'mediumDate' }}</p>
+                    <p><strong>Check-out:</strong> {{ selectedReservation.checkOutDate | date:'mediumDate' }}</p>
+                    <p><strong>Nights:</strong> {{getNights()}} </p>
+                </div>
+
+                <!-- Payment Column -->
+                <div class="detail-column">
+                    <h4><i class="fas fa-money-bill-wave me-2"></i>Payment</h4>
+                    <p><strong>Total:</strong> {{ selectedReservation.totalAmount | currency }}</p>
+                    <p><strong>Created:</strong> {{ selectedReservation.createdAt | date:'mediumDate' }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn btn-danger me-3" (click)="isDetailModalOpen = false">
+                Close
+            </button>
+            <button class="btn btn-success"
+                *ngIf="selectedReservation && selectedReservation.reservationStatus == 'Confirmed'"
+                (click)="downloadPaymentPdf(selectedReservation.id)">
+                DownloadPdf
+            </button>
+            <button class="btn btn-success"
+                *ngIf="selectedReservation && selectedReservation.reservationStatus == 'CheckedOut'"
+                (click)="openFeedbackModal(feedback, selectedReservation.id)">
+                Leave Feedback
+            </button>
+        </div>
+    </div>
+</div>
+<div *ngIf="showModal" class="modal fade show d-block" style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form (ngSubmit)="submitForm()">
+                <div class="modal-header">
+                    <h5 class="modal-title">{{ isEditMode ? 'Edit feedback' : 'Add feedback' }}</h5>
+                    <button type="button" class="btn-close" (click)="closeModal()"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Reservation Id</label>
+                        <input type="number" class="form-control" [(ngModel)]="feedback.reservationId"
+                            name="reservationId" disabled required>
+                    </div>
+                    <div class="mb-3">
+                        <div class="mb-3">
+                            <label for="ratingSelect" class="form-label">
+                                <i class="fas fa-star text-warning me-1"></i>Rating <span class="text-danger">*</span>
+                            </label>
+
+                            <select class="form-select" id="ratingSelect" name="rating" [(ngModel)]="feedback.rating"
+                                required>
+                                <option value="" disabled selected>Select a rating</option>
+                                <option *ngFor="let i of [1,2,3,4,5]" [ngValue]="i">
+                                    {{i}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Comment</label>
+                        <input type="text" class="form-control" [(ngModel)]="feedback.comment" name="comment">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">{{ isEditMode ? 'Update' : 'Add' }} Feedback </button>
+                    <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

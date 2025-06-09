@@ -1,0 +1,146 @@
+<div class="feedback-management-container">
+    <!-- Header Section with Filter Buttons -->
+    <div class="management-header">
+        <div class="header-content">
+            <mat-icon class="header-icon">reviews</mat-icon>
+            <h1 class="management-title">Feedback Management</h1>
+        </div>
+        <div class="filter-buttons">
+            <button *ngIf="role === 'Guest'" mat-stroked-button [color]="showAllFeedbacks ? 'primary' : ''"
+                (click)="loadFeedbacks()">
+                <mat-icon>list_alt</mat-icon>
+                All Feedbacks
+            </button>
+            <button *ngIf="role === 'Guest'" mat-stroked-button [color]="!showAllFeedbacks ? 'primary' : ''"
+                (click)="loadMyReservationFeedbacks()">
+                <mat-icon>person</mat-icon>
+                My Feedbacks
+            </button>
+        </div>
+
+        <!-- Rest of your existing template -->
+    </div>
+
+    <!-- Status Indicators -->
+    <div class="status-container">
+        <!-- Loading State -->
+        <div *ngIf="isLoading" class="loading-state">
+            <mat-spinner diameter="50" color="accent"></mat-spinner>
+            <span class="loading-text">Gathering feedback...</span>
+        </div>
+
+        <!-- Error State -->
+        <div *ngIf="errorMessage" class="error-state mat-elevation-z2">
+            <div class="error-content">
+                <mat-icon class="error-icon">error_outline</mat-icon>
+                <div class="error-message">{{ errorMessage }}</div>
+            </div>
+            <button mat-flat-button color="warn" (click)="loadFeedbacks()" class="retry-button">
+                <mat-icon>refresh</mat-icon>
+                Try Again
+            </button>
+        </div>
+
+        <!-- Success Content -->
+        <div *ngIf="!isLoading && Feedbacks.length > 0" class="feedback-content">
+            <div class="feedback-summary mat-elevation-z1">
+                <div class="summary-item">
+                    <mat-icon>star</mat-icon>
+                    <span>Average Rating: <strong>{{ averageRating | number:'1.1-1' }}/5</strong></span>
+                </div>
+                <div class="summary-item">
+                    <mat-icon>comment</mat-icon>
+                    <span>Total Feedback: <strong>{{ Feedbacks.length }}</strong></span>
+                </div>
+            </div>
+
+            <!-- Feedback List -->
+            <div class="feedback-list">
+                <mat-card *ngFor="let feedback of Feedbacks" class="feedback-card mat-elevation-z2">
+                    <mat-card-header>
+                        <div mat-card-avatar class="user-avatar">
+                            {{ feedback.userName | slice:0:1 | uppercase }}
+                        </div>
+                        <mat-card-title>{{ feedback.userName }}</mat-card-title>
+                        <mat-card-subtitle>
+                            <span class="reservation-id fs-6 me-3">Reservation #{{ feedback.reservationId }}</span>
+                            <span class="rating-stars">
+                                <mat-icon *ngFor="let star of [1,2,3,4,5]">
+                                    {{ star <= feedback.rating ? 'star' : 'star_border' }} </mat-icon>
+                            </span>
+                        </mat-card-subtitle>
+                    </mat-card-header>
+
+                    <mat-card-content>
+                        <p class="feedback-comment">{{ feedback.comment }}</p>
+                        <div class="action-buttons feedback-meta">
+                            <button *ngIf="role == 'Guest'" mat-stroked-button color="primary"
+                                (click)="openEditModal(feedback)" class="edit-button">
+                                <mat-icon>edit</mat-icon>
+                                Edit
+                            </button>
+                            <button *ngIf="role == 'Guest'" mat-stroked-button color="warn"
+                                (click)="deleteFeedback(feedback.id)" class="delete-button">
+                                <mat-icon>delete</mat-icon>
+                                Remove
+                            </button>
+                        </div>
+                    </mat-card-content>
+                </mat-card>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="!isLoading && Feedbacks.length === 0 && !errorMessage" class="empty-state mat-elevation-z1">
+            <mat-icon class="empty-icon">sentiment_neutral</mat-icon>
+            <h3>No Feedback Yet</h3>
+            <p>Be the first to share your experience</p>
+            <button mat-raised-button color="primary" (click)="openFeedbackModal(feedback, feedback.reservationId)">
+                <mat-icon>add_comment</mat-icon>
+                Add Feedback
+            </button>
+        </div>
+    </div>
+</div>
+<div *ngIf="showModal" class="modal fade show d-block" style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form (ngSubmit)="submitForm()">
+                <div class="modal-header">
+                    <h5 class="modal-title">{{ isEditMode ? 'Edit feedback' : 'Add feedback' }}</h5>
+                    <button type="button" class="btn-close" (click)="closeModal()"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Reservation Id</label>
+                        <input type="number" class="form-control" [(ngModel)]="feedback.reservationId"
+                            name="reservationId" disabled required>
+                    </div>
+                    <div class="mb-3">
+                        <div class="mb-3">
+                            <label for="ratingSelect" class="form-label">
+                                <i class="fas fa-star text-warning me-1"></i>Rating <span class="text-danger">*</span>
+                            </label>
+
+                            <select class="form-select" id="ratingSelect" name="rating" [(ngModel)]="feedback.rating"
+                                required>
+                                <option value="" disabled selected>Select a rating</option>
+                                <option *ngFor="let i of [1,2,3,4,5]" [ngValue]="i">
+                                    {{i}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Comment</label>
+                        <input type="text" class="form-control" [(ngModel)]="feedback.comment" name="comment">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">{{ isEditMode ? 'Update' : 'Add' }} Feedback </button>
+                    <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

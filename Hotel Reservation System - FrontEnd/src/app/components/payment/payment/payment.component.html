@@ -1,0 +1,81 @@
+<div class="payment-page">
+  @if (role === 'Guest') {
+  <div class="payment-card">
+    <div class="payment-header">
+      <h2>Complete Your Payment</h2>
+      <div class="payment-amount">
+        {{ amount | currency }}
+        <span class="payment-label">Total Due</span>
+      </div>
+    </div>
+
+    @if (error) {
+    <div class="payment-error">
+      <i class="fas fa-exclamation-circle mr-2"></i>
+      {{ error }}
+    </div>
+    }
+
+    <div class="payment-actions">
+      <button class="secondary-btn" (click)="cancel()" [disabled]="processing">
+        Cancel
+      </button>
+      <button class="secondary-btn" (click)="pay()" [disabled]="processing">
+        {{ processing ? 'Processing...' : 'Pay Now' }}
+      </button>
+    </div>
+  </div>
+  }
+  @if(role === 'Admin' || role === 'HotelStaff'){
+  <!-- Payment History Table -->
+  <div class="payment-history">
+    <h3 class="section-title">Payment History</h3>
+
+    @if (loadError) {
+    <div class="error-alert">
+      Failed to load payment history. Please try again later.
+    </div>
+    } @else {
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Payment ID</th>
+            <th>Reservation ID</th>
+            <th>Amount</th>
+            <th>Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (payments.length > 0) {
+          @for (payment of payments; track payment.id) {
+          <tr>
+            <td>{{ payment.id }}</td>
+            <td>{{ payment.reservationId }}</td>
+            <td>{{ payment.amount | currency }}</td>
+            <td>{{ payment.transactionDate | date: 'medium' }}</td>
+            <td>
+              <span class="status-badge" [ngClass]="{
+                    'paid': payment.paymentStatus === 'Paid',
+                    'unpaid': payment.paymentStatus === 'Unpaid',
+                    'refunded': payment.paymentStatus === 'Refunded',
+                    'failed': payment.paymentStatus === 'Failed'
+                  }">
+                {{ payment.paymentStatus }}
+              </span>
+            </td>
+          </tr>
+          }
+          } @else {
+          <tr class="no-data">
+            <td colspan="5">No payment history available</td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    }
+  </div>
+  }
+</div>

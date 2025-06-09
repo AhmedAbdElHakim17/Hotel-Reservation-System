@@ -1,5 +1,3 @@
-import { RoomType } from "../Enums/RoomType.enum";
-
 export interface IRoom {
     id: number,
     roomNum: number,
@@ -7,5 +5,5 @@ export interface IRoom {
     isAvailable: boolean,
     imageUrl: string,
     facilities: string,
-    roomType: RoomType
+    roomType: string
 }

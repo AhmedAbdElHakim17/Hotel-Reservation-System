@@ -12,53 +12,16 @@ export class OfferService {
   private readonly apiBaseUrl = `${environment.baseUrl}/api/Offer`
   constructor(private httpClient: HttpClient) { }
   getAllOffers(): Observable<ApiResponse<IOffer[]>> {
-    return this.httpClient.get<ApiResponse<IOffer[]>>(`${this.apiBaseUrl}/All`).pipe(
-      map(res => res),
-      catchError(error => {
-        return of({
-          message: error.message,
-          data: error.data,
-          isSuccess: error.isSuccess
-        });
-      })
-    )
+    return this.httpClient.get<ApiResponse<IOffer[]>>(`${this.apiBaseUrl}/All`)
   }
-
-  AddFeedback(data: IOffer): Observable<ApiResponse<IOffer>> {
-    return this.httpClient.post<ApiResponse<IOffer>>(`${this.apiBaseUrl}/Add`, data).pipe(
-      map(res => res),
-      catchError(error => {
-        return of({
-          message: error.message,
-          data: error.data,
-          isSuccess: error.isSuccess
-        });
-      })
-    )
+  AddOffer(data: IOffer): Observable<ApiResponse<IOffer>> {
+    return this.httpClient.post<ApiResponse<IOffer>>(`${this.apiBaseUrl}/Add`, data)
   }
-  UpdateFeedback(id: number, data: IOffer): Observable<ApiResponse<IOffer>> {
-    return this.httpClient.put<ApiResponse<IOffer>>(`${this.apiBaseUrl}/Update/${id}`, data).pipe(
-      map(res => res),
-      catchError(error => {
-        return of({
-          message: error.message,
-          data: error.data,
-          isSuccess: error.isSuccess
-        });
-      })
-    )
+  UpdateOffer(id: number, data: IOffer): Observable<ApiResponse<IOffer>> {
+    return this.httpClient.put<ApiResponse<IOffer>>(`${this.apiBaseUrl}/Update/${id}`, data)
   }
-  DeleteFeedback(id: number): Observable<ApiResponse<IOffer>> {
-    return this.httpClient.delete<ApiResponse<IOffer>>(`${this.apiBaseUrl}/Delete/${id}`, {}).pipe(
-      map(res => res),
-      catchError(error => {
-        return of({
-          message: error.message,
-          data: error.data,
-          isSuccess: error.isSuccess
-        });
-      })
-    )
+  DeleteOffer(id: number): Observable<ApiResponse<IOffer>> {
+    return this.httpClient.delete<ApiResponse<IOffer>>(`${this.apiBaseUrl}/Delete/${id}`, {})
   }
 
 }

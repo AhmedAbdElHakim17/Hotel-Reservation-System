@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, signal } from '@angular/core';
-import { RedirectCommand, Router } from '@angular/router';
-import { catchError, delay, map, Observable, of, tap, throwError } from 'rxjs';
+import { Router } from '@angular/router';
+import { BehaviorSubject, catchError, map, Observable, of, tap } from 'rxjs';
 import { environment } from '../../environments/environment.development';
 import { IUser } from '../../models/IUser';
 import { ApiResponse } from '../../models/apiResponse';
@@ -16,22 +16,17 @@ export class AuthService {
 
   private readonly apiBaseUrl = `${environment.baseUrl}/api/Account`
   private readonly TOKEN_KEY = 'access_token';
+  private authChanged = new BehaviorSubject<boolean>(false);
+  authStatus$ = this.authChanged.asObservable();
   isAuthenticated = signal(true);
+  role!: string;
 
   constructor(private http: HttpClient, private router: Router) {
     this.isAuthenticated.set(!!this.getToken());
   }
 
   register(userData: IRegister): Observable<ApiResponse<IRegister>> {
-    return this.http.post<ApiResponse<IRegister>>(`${this.apiBaseUrl}/Register`, userData).pipe(
-      map(res => res),
-      catchError(error => {
-        return of({
-          message: error.message,
-          data: error.data,
-          isSuccess: error.isSuccess
-        });
-      }))
+    return this.http.post<ApiResponse<IRegister>>(`${this.apiBaseUrl}/Register`, userData);
   }
 
   login(user: IUser): Observable<ApiResponse<ILogin>> {
@@ -48,22 +43,19 @@ export class AuthService {
         localStorage.setItem('token', response.data.token)
         localStorage.setItem('tokenExpiry', response.data.expiration);
         this.isAuthenticated.set(true);
-      }),
-      catchError(error => {
-        return of({
-          message: error.message || "Login failed",
-          data: error.data,
-          isSuccess: error.isSuccess
-        });
-      })
-    );
+        this.getUserRole().subscribe();
+        this.notifyAuthChanged();
+      },
+      ))
   }
 
   logout(): void {
     localStorage.removeItem('token');
     localStorage.removeItem('tokenExpiry');
+    localStorage.removeItem('role');
     this.isAuthenticated.set(false);
-    this.router.navigate(['/login']);  }
+    this.router.navigate(['/login']);
+  }
 
   getToken(): string | null {
     return localStorage.getItem('token');
@@ -100,6 +92,13 @@ export class AuthService {
     return this.isAuthenticated;
   }
   getUserRole(): Observable<ApiResponse<IRole>> {
-    return this.http.get<ApiResponse<IRole>>(`${this.apiBaseUrl}/UserRole`);
+    return this.http.get<ApiResponse<IRole>>(`${this.apiBaseUrl}/UserRole`).pipe(
+      tap(res => {
+        localStorage.setItem('role', res.data.name);
+      })
+    )
+  }
+  notifyAuthChanged() {
+    this.authChanged.next(this.isAuthenticated());
   }
 }

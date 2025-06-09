@@ -1,0 +1,137 @@
+/* Add to your stylesheet */
+.reservation-dashboard {
+    background-color: #f8f9fa;
+}
+
+.text-gradient-primary {
+    background: linear-gradient(90deg, #4e73df 0%, #224abe 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.hover-effect {
+    transition: all 0.3s ease;
+    transform: translateY(0);
+}
+
+.hover-effect:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+.icon-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bg-primary-light {
+    background-color: rgba(78, 115, 223, 0.1);
+}
+
+.detail-item {
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+}
+
+.empty-state {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+    padding: 16px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-body {
+    padding: 16px;
+}
+
+.modal-footer {
+    padding: 16px;
+    border-top: 1px solid #eee;
+    text-align: right;
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+}
+
+.status-badge {
+    border-radius: 16px;
+
+    &.confirmed {
+        background: green;
+        color: white;
+    }
+
+    &.pending {
+        background: #f8c007;
+        color: black;
+    }
+
+    &.checkedOut {
+        background: #3b07f8;
+        color: white;
+    }
+
+    &.cancelled {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    &.expired {
+        background: gray;
+        color: white;
+    }
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+.card-footer {
+    position: relative;
+}
+
+app-payment {
+    margin-top: 10px;
+    display: block;
+}

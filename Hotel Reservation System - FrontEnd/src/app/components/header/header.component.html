@@ -1,79 +1,146 @@
-<nav class="navbar navbar-expand-lg bg-body-tertiary">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="#">ECommerce</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+<nav class="navbar navbar-expand-lg navbar-dark shadow-sm sticky-top"
+    style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);">
+    <div class="container">
+        <!-- Brand Logo -->
+        <a class="navbar-brand d-flex align-items-center" href="#">
+            <i class="fas fa-hotel me-2 fa-lg"></i>
+            <span class="fw-bold">Hilton Hotel</span>
+        </a>
+
+        <!-- Mobile Toggle Button -->
+        <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse"
+            data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false"
+            aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="#" [routerLink]="['/Home']"
-                        routerLinkActive="bg-success">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="#" [routerLink]="['/About']"
-                        routerLinkActive="bg-success">About Us</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="#" [routerLink]="['/Contact']"
-                        routerLinkActive="bg-success">Contact Us</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="#" [routerLink]="['/Feedback']"
-                        routerLinkActive="bg-success">Feedbacks</a>
-                </li>
-                <div class="row">
-                    <div class="col">
-                        <div ngbDropdown class="d-inline-block">
-                            <button type="button" class="btn btn-outline-primary" id="dropdownBasic1" ngbDropdownToggle>
-                                Reservation
-                            </button>
-                            <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-                                <button ngbDropdownItem><a class="nav-link active" aria-current="page" href="#"
-                                        [routerLink]="['/Reservation/All']"
-                                        routerLinkActive="bg-success">Reservations</a></button>
-                                <button ngbDropdownItem><a class="nav-link active" aria-current="page" href="#"
-                                        [routerLink]="['/Reservation/allUpcoming']"
-                                        routerLinkActive="bg-success">UpcomingReservations</a></button>
-                                <button ngbDropdownItem><a class="nav-link active" aria-current="page" href="#"
-                                        [routerLink]="['/Reservation/My']"
-                                        routerLinkActive="bg-success">MyReservations</a></button>
-                                <button ngbDropdownItem><a class="nav-link active" aria-current="page" href="#"
-                                        [routerLink]="['/Reservation/MyUpcoming']"
-                                        routerLinkActive="bg-success">MyUpcomingReservations</a></button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="#" [routerLink]="['/Room/All']"
-                        routerLinkActive="bg-success">Rooms</a>
-                </li>
-                <div ngbDropdown class="d-inline-block">
-                    <button type="button" class="btn btn-outline-primary" id="dropdownBasic1" ngbDropdownToggle>
-                        Authentication
-                    </button>
-                    <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-                        <button ngbDropdownItem><a class="nav-link active" aria-current="page" href="#"
-                                [routerLink]="['/login']" routerLinkActive="bg-success">Login</a></button>
-                        <button ngbDropdownItem><a class="nav-link active" aria-current="page" href="#"
-                                [routerLink]="['/register']" routerLinkActive="bg-success">Register</a></button>
-                    </div>
-                </div>
-                <!-- <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="#" [routerLink]="['/login']"
-                        routerLinkActive="bg-success">Login</a>
-                </li> -->
-                <!-- <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="#" [routerLink]="['/register']"
-                        routerLinkActive="bg-success">Register</a>
-                </li> -->
-                <li class="nav-item">
-                    <a class="nav-link active fas fa-sign-out-alt" aria-current="page" href="#" (click)="logout()">Logout</a>
-                </li>
 
+        <!-- Navigation Links -->
+        <div class="collapse navbar-collapse" id="navbarContent">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item mx-1">
+                    <a class="nav-link rounded px-3 py-2 d-flex align-items-center" [routerLink]="['/Home']"
+                        routerLinkActive="active bg-white text-primary">
+                        <i class="fas fa-home me-2"></i> Home
+                    </a>
+                </li>
+                <li class="nav-item mx-1">
+                    <a class="nav-link rounded px-3 py-2 d-flex align-items-center" [routerLink]="['/About']"
+                        routerLinkActive="active bg-white text-primary">
+                        <i class="fas fa-info-circle me-2"></i> About
+                    </a>
+                </li>
+                <li class="nav-item mx-1">
+                    <a class="nav-link rounded px-3 py-2 d-flex align-items-center" [routerLink]="['/Room']"
+                        routerLinkActive="active bg-white text-primary">
+                        <i class="fas fa-bed me-2"></i> Rooms
+                    </a>
+                </li>
+                <li class="nav-item mx-1">
+                    <a class="nav-link rounded px-3 py-2 d-flex align-items-center" [routerLink]="['/Offer']"
+                        routerLinkActive="active bg-white text-primary">
+                        <i class="fas fa-tag me-2"></i> Offers
+                    </a>
+                </li>
+                <li class="nav-item mx-1" *ngIf="isAuthenticated()">
+                    <a class="nav-link rounded px-3 py-2 d-flex align-items-center" [routerLink]="['/Reservation']"
+                        routerLinkActive="active bg-white text-primary">
+                        <i class="fas fa-calendar-check me-2"></i> Reservations
+                    </a>
+                </li>
+                <li class="nav-item mx-1" *ngIf="role === 'Admin' || role === 'HotelStaff'">
+                    <a class="nav-link rounded px-3 py-2 d-flex align-items-center" [routerLink]="['/Payment']"
+                        routerLinkActive="active bg-white text-primary">
+                        <i class="fas fa-calendar-check me-2"></i> Payments
+                    </a>
+                </li>
+                <li class="nav-item mx-1">
+                    <a class="nav-link rounded px-3 py-2 d-flex align-items-center" [routerLink]="['/Feedback']"
+                        routerLinkActive="active bg-white text-primary">
+                        <i class="fas fa-comment-alt me-2"></i> Feedbacks
+                    </a>
+                </li>
             </ul>
+
+            <!-- User Authentication Section -->
+            <div class="d-flex align-items-center">
+                <ul class="navbar-nav">
+                    <!-- Authenticated User Dropdown -->
+                    <li ngbDropdown class="nav-item dropdown" *ngIf="role != undefined; else authLinks">
+                        <div class="nav-link dropdown-toggle d-flex align-items-center rounded-pill bg-white bg-opacity-25 py-3"
+                            id="authDropdown" ngbDropdownToggle>
+                            <i class="fas fa-user-circle fa-lg me-2 text-white"></i>
+                        </div>
+                        <div ngbDropdownMenu class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 mt-2"
+                            aria-labelledby="authDropdown">
+                            <!-- User Role Section -->
+                            <div class="px-4 py-3 border-bottom">
+                                <div class="d-flex align-items-center">
+                                    <div class="me-3">
+                                        <i class="fas fa-user-shield fa-2x text-primary"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-muted small mb-1">Logged in as</div>
+                                        <span class="badge rounded-pill fw-bold px-3 py-2" [ngClass]="{
+                                            'bg-success': role === 'Admin',
+                                            'bg-info': role === 'HotelStaff',
+                                            'bg-secondary': role === 'Guest'
+                                        }">
+                                            <i class="fas" [ngClass]="{
+                                                'fa-user-tie': role === 'Admin',
+                                                'fa-user-cog': role === 'HotelStaff',
+                                                'fa-user': role === 'Guest'
+                                            }"></i>
+                                            {{ role }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Account Options -->
+                            <a class="dropdown-item d-flex align-items-center py-2 px-4" href="#">
+                                <i class="fas fa-user-circle me-3 text-primary"></i>
+                                <span>My Profile</span>
+                            </a>
+                            <a class="dropdown-item d-flex align-items-center py-2 px-4" href="#">
+                                <i class="fas fa-cog me-3 text-primary"></i>
+                                <span>Settings</span>
+                            </a>
+
+                            <div class="dropdown-divider"></div>
+
+                            <!-- Logout Option -->
+                            <a ngbDropdownItem (click)="logout()"
+                                class="dropdown-item d-flex align-items-center py-2 px-4">
+                                <i class="fas fa-sign-out-alt me-3 text-danger"></i>
+                                <span class="text-danger fw-medium">Sign Out</span>
+                            </a>
+                        </div>
+                    </li>
+
+                    <!-- Login/Register Template -->
+                    <ng-template #authLinks>
+                        <li ngbDropdown class="nav-item dropdown">
+                            <div class="nav-link dropdown-toggle d-flex align-items-center rounded-pill bg-white bg-opacity-25 px-3 py-2"
+                                id="authDropdown" ngbDropdownToggle>
+                                <i class="fas fa-user-circle fa-lg me-2 text-white"></i>
+                                <span class="d-none d-md-inline text-white">Sign In</span>
+                            </div>
+                            <div ngbDropdownMenu class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 mt-2"
+                                aria-labelledby="authDropdown">
+                                <a class="dropdown-item d-flex align-items-center py-2 px-4" [routerLink]="['/login']">
+                                    <i class="fas fa-sign-in-alt me-3 text-primary"></i>
+                                    <span>Login</span>
+                                </a>
+                                <a class="dropdown-item d-flex align-items-center py-2 px-4"
+                                    [routerLink]="['/register']">
+                                    <i class="fas fa-user-plus me-3 text-primary"></i>
+                                    <span>Register</span>
+                                </a>
+                            </div>
+                        </li>
+                    </ng-template>
+                </ul>
+            </div>
         </div>
     </div>
 </nav>

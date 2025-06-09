@@ -1,0 +1,77 @@
+<section class="admin-dashboard" *ngIf="role === 'Admin'">
+  <div class="dashboard-header">
+    <h1 class="dashboard-title">Admin Dashboard</h1>
+    <p class="dashboard-subtitle">Welcome to Hilton Hotel</p>
+  </div>
+
+  <!-- Quick Stats Cards -->
+  <div class="stats-container">
+    <div class="stat-card">
+      <div class="stat-icon"><i class="fas fa-door-open"></i></div>
+      <div class="stat-info">
+        <h3>{{ roomStats.total || 0 }}</h3>
+        <p>Total Rooms</p>
+      </div>
+      <a class="stat-link" routerLink="/Room">Manage</a>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
+      <div class="stat-info">
+        <h3>{{ reservationStats.pending || 0 }}</h3>
+        <p>Pending Reservations</p>
+      </div>
+      <a class="stat-link" routerLink="/Reservation">View</a>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon"><i class="fas fa-bed"></i></div>
+      <div class="stat-info">
+        <h3>{{ roomStats.available || 0 }}</h3>
+        <p>Available Rooms</p>
+      </div>
+      <a class="stat-link" routerLink="/Room">Manage</a>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon"><i class="fas fa-comments"></i></div>
+      <div class="stat-info">
+        <h3>{{ feedbackStats.new || 0 }}</h3>
+        <p>New Feedback</p>
+      </div>
+      <a class="stat-link" routerLink="/Feedback">Review</a>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions">
+    <h2>Quick Actions</h2>
+    <div class="actions-container">
+      <a class="action-button" routerLink="/Room" [queryParams]="{action: 'add'}">
+        <i class="fas fa-plus-circle"></i>
+        <span>Add New Room</span>
+      </a>
+      <a class="action-button" routerLink="/Offer" [queryParams]="{action: 'add'}">
+        <i class="fas fa-tag"></i>
+        <span>Create Offer</span>
+      </a>
+      <a class="action-button" routerLink="/Reservation">
+        <i class="fas fa-search"></i>
+        <span>View Reservations</span>
+      </a>
+      <a class="action-button" routerLink="/Feedback">
+        <i class="fas fa-star"></i>
+        <span>Review Feedback</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="hero-section" *ngIf="role !== 'Admin' && role !== 'HotelStaff' ">
+  <div class="hero-content">
+    <h1 class="hero-title">Experience Luxury at Hilton Hotel</h1>
+    <p class="hero-subtitle">Indulge in exceptional comfort and world-class service</p>
+    <a class="btn cta-button" routerLink="/Room">Book Your Stay</a>
+  </div>
+</section>
+

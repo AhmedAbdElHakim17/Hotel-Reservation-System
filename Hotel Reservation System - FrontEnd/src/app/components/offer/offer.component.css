@@ -1,0 +1,20 @@
+.modal-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1050;
+    overflow-y: auto;
+}
+
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #3f87a6, #ebf8e1);
+}
+
+.form-range::-webkit-slider-thumb {
+    background: var(--bs-primary);
+}
+
+.animate__animated {
+    --animate-duration: 0.3s; }

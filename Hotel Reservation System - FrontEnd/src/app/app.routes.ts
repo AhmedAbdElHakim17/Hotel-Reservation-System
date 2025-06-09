@@ -1,14 +1,12 @@
 import { Routes } from '@angular/router';
+import { AboutComponent } from './components/about/about.component';
 import { HomeComponent } from './components/home/home.component';
 import { NotfoundComponent } from './components/notfound/notfound.component';
-import { ReservationComponent } from './components/ReservationModule/allReservations/reservation.component';
-import { FeedbackComponent } from './components/FeedbackModule/allFeedbacks/feedback.component';
+import { FeedbackComponent } from './components/feedback/feedback.component';
 import { AuthGuard } from './guards/auth.guard';
-import { AllUpcomingReservationComponent } from './components/ReservationModule/allUpcomingReservation/allUpcomingReservation.component';
-import { MyReservationsComponent } from './components/ReservationModule/myReservations/myReservations.component';
-import { MyUpcomingReservationsComponent } from './components/ReservationModule/myUpcomingReservations/myUpcomingReservations.component';
+import { RoomComponent } from './components/Room/room.component';
 import { OfferComponent } from './components/offer/offer.component';
-import { RoomComponent } from './components/RoomModule/allRooms/room.component';
+import { PaymentComponent } from './components/payment/payment/payment.component';
 
 export const routes: Routes = [
     { path: "", pathMatch: 'full', redirectTo: "/Home" },
@@ -21,18 +19,24 @@ export const routes: Routes = [
         path: 'register',
         loadComponent: () => import('./components/AuthModule/register/register.component').then(m => m.RegisterComponent)
     },
-
-    {
-        path: 'dashboard',
-        loadComponent: () => import('./components/dashboard/dashboard.component').then(m => m.DashboardComponent),
-        canActivate: [AuthGuard]
-    },
     { path: '', redirectTo: 'login', pathMatch: 'full' },
     { path: "Feedback", component: FeedbackComponent },
-    { path: "Reservation/All", component: ReservationComponent },
-    { path: "Reservation/allUpcoming", component: AllUpcomingReservationComponent },
-    { path: "Reservation/My", component: MyReservationsComponent },
-    { path: "Reservation/MyUpcoming", component: MyUpcomingReservationsComponent },
-    { path: "Room/All", component: RoomComponent },
-    { path: "**", component: NotfoundComponent }
+    {
+        path: "Reservation",
+        loadComponent: () => import('./components/reservation/reservation.component').then(m => m.ReservationComponent),
+        canActivate: [AuthGuard]
+    },
+    { path: "Offer", component: OfferComponent },
+    { path: "Room", component: RoomComponent },
+    { path: 'About', component: AboutComponent },
+    {
+        path: 'Payment', component: PaymentComponent
+        // loadComponent: () => import('./components/payment/payment/payment.component').then(m => m.PaymentComponent)
+    },
+    {
+        path: 'reservation',
+        loadComponent: () => import('./components/reservation/reservation.component').then(m => m.ReservationComponent)
+    },
+    { path: "**", component: NotfoundComponent },
 ];
+
