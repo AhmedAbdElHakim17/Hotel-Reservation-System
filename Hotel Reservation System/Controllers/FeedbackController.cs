@@ -47,7 +47,7 @@ namespace HRS.Presentation.Controllers
         {
             try
             {
-                var response = await feedbackService.AddFeedbackAsync(feedbackDTO);
+                var response = await feedbackService.AddFeedbackAsync(feedbackDTO, User);
                 if (!response.IsSuccess) return BadRequest(response.Message);
                 return Ok(response);
             }

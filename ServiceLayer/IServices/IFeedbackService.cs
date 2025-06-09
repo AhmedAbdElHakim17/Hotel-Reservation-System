@@ -12,7 +12,7 @@ namespace HRS_ServiceLayer.IServices
     {
         Task<ResponseDTO<List<FeedbackDTO>>> GetAllFeedbacksAsync();
         Task<ResponseDTO<List<FeedbackDTO>>> GetMyFeedbacksAsync(ClaimsPrincipal User);
-        Task<ResponseDTO<FeedbackDTO>> AddFeedbackAsync(FeedbackDTO feedbackDTO);
+        Task<ResponseDTO<FeedbackDTO>> AddFeedbackAsync(FeedbackDTO feedbackDTO, ClaimsPrincipal claims);
         Task<ResponseDTO<FeedbackDTO>> UpdateFeedbackAsync(FeedbackDTO feedbackDTO, int id);
         Task<ResponseDTO<FeedbackDTO>> DeleteFeedbackAsync(int id);
 

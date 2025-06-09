@@ -64,7 +64,7 @@ namespace HRS_ServiceLayer.Services
                 var authDTO = new AuthDTO
                 {
                     Token = new JwtSecurityTokenHandler().WriteToken(token),
-                    Expiration = DateTime.Now.AddHours(1)
+                    Expiration = DateTime.Now.AddHours(1),
                 };
                 return new ResponseDTO<AuthDTO>("User's Login succeeded", authDTO);
             }

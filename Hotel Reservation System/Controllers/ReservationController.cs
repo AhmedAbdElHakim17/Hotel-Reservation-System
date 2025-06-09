@@ -19,7 +19,7 @@ namespace HRS.Presentation.Controllers
             try
             {
                 var response = await reservationService.GetAllReservationsAsync();
-                if (!response.IsSuccess) return BadRequest(response.Message);
+                if (!response.IsSuccess) return BadRequest(response);
                 return Ok(response);
             }
             catch (Exception ex)
@@ -35,7 +35,7 @@ namespace HRS.Presentation.Controllers
             try
             {
                 var response = await reservationService.GetUpcomingReservationsAsync();
-                if (!response.IsSuccess) return BadRequest(response.Message);
+                if (!response.IsSuccess) return BadRequest(response);
                 return Ok(response);
             }
             catch (Exception ex)
@@ -52,7 +52,7 @@ namespace HRS.Presentation.Controllers
             try
             {
                 var response = await reservationService.GetUserUpcomingReservationsAsync(User);
-                if (!response.IsSuccess) return BadRequest(response.Message);
+                if (!response.IsSuccess) return BadRequest(response);
                 return Ok(response);
             }
             catch (Exception ex)
@@ -68,12 +68,28 @@ namespace HRS.Presentation.Controllers
             try
             {
                 var response = await reservationService.GetAllUserReservationsAsync(User);
-                if (!response.IsSuccess) return BadRequest(response.Message);
+                if (!response.IsSuccess) return BadRequest(response);
                 return Ok(response);
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error Getting User Reservations");
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+        [HttpGet("GetById/{id:int}")]
+        [Authorize(Roles = "Guest")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            try
+            {
+                var response = await reservationService.GetReservationById(id);
+                if (!response.IsSuccess) return BadRequest(response);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error Getting User Reservation");
                 return StatusCode(500, "Internal Server Error");
             }
         }
@@ -83,10 +99,11 @@ namespace HRS.Presentation.Controllers
         {
             try
             {
-                var response = await emailService.GetInvoicePdfAsync(reservationId);
+                var response = await emailService.GetInvoicePdfAsync(reservationId,false);
                 if (!response.IsSuccess) 
-                    return BadRequest(response.Message);
-                return File(response.Data, "application/pdf", $"invoice-{reservationId}.pdf");
+                    return BadRequest(response);
+                var pdfBytes = response.Data;
+                return File(pdfBytes, "application/pdf", $"invoice-{reservationId}.pdf");
             }
             catch (Exception ex)
             {
@@ -102,7 +119,7 @@ namespace HRS.Presentation.Controllers
             try
             {
                 var response = await reservationService.AddReservationAsync(reservationDTO, User);
-                if (!response.IsSuccess) return BadRequest(response.Message);
+                if (!response.IsSuccess) return BadRequest(response);
                 return Ok(response);
             }
             catch (Exception ex)
@@ -119,7 +136,7 @@ namespace HRS.Presentation.Controllers
             try
             {
                 var response = await reservationService.UpdateReservationAsync(reservationDTO, id);
-                if (!response.IsSuccess) return BadRequest(response.Message);
+                if (!response.IsSuccess) return BadRequest(response);
                 return Ok(response);
             }
             catch (Exception ex)
@@ -135,7 +152,7 @@ namespace HRS.Presentation.Controllers
             try
             {
                 var response = await reservationService.CheckInReservationAsync(id,User);
-                if (!response.IsSuccess) return BadRequest(response.Message);
+                if (!response.IsSuccess) return BadRequest(response);
                 return Ok(response);
             }
             catch (Exception ex)
@@ -151,7 +168,7 @@ namespace HRS.Presentation.Controllers
             try
             {
                 var response = await reservationService.ConfirmReservationAsync(id, User);
-                if (!response.IsSuccess) return BadRequest(response.Message);
+                if (!response.IsSuccess) return BadRequest(response);
                 return Ok(response);
             }
             catch (Exception ex)
@@ -167,7 +184,7 @@ namespace HRS.Presentation.Controllers
             try
             {
                 var response = await reservationService.CheckOutReservationAsync(id, User);
-                if (!response.IsSuccess) return BadRequest(response.Message);
+                if (!response.IsSuccess) return BadRequest(response);
                 return Ok(response);
             }
             catch (Exception ex)
@@ -183,7 +200,7 @@ namespace HRS.Presentation.Controllers
             try
             {
                 var response = await reservationService.CancelReservationAsync(id);
-                if (!response.IsSuccess) return BadRequest(response.Message);
+                if (!response.IsSuccess) return BadRequest(response);
                 return Ok(response);
             }
             catch (Exception ex)

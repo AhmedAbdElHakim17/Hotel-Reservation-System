@@ -20,7 +20,7 @@ namespace HRS_ServiceLayer.Services
 
         public async Task<ResponseDTO<List<RoomGetDTO>>> GetAllRoomsAsync()
         {
-            var rooms = await unitOfWork.Rooms.GetAllAsync();
+            var rooms = await unitOfWork.Rooms.GetAllAsync(true);
             if (rooms == null || rooms.Count == 0)
                 return new ResponseDTO<List<RoomGetDTO>>("No rooms found", null);
 
@@ -31,9 +31,9 @@ namespace HRS_ServiceLayer.Services
         public async Task<ResponseDTO<List<RoomGetDTO>>> GetAvailableRoomsAsync(DateTime from, DateTime to)
         {
             if (from > to)
-                return new ResponseDTO<List<RoomGetDTO>>("From must be earlier than To", null);
+                return new ResponseDTO<List<RoomGetDTO>>("Start Date must be earlier than End Date", null);
             var availableRooms = await unitOfWork.Rooms.GetAllAvailableAsync(from, to);
-            if (availableRooms == null || availableRooms.Count == 0)
+            if (availableRooms == null)
                 return new ResponseDTO<List<RoomGetDTO>>("No available rooms found", null);
 
             var roomDTOs = mapper.Map<List<RoomGetDTO>>(availableRooms);

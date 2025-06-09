@@ -13,6 +13,6 @@ namespace HRS_ServiceLayer.IServices
         ResponseDTO<byte[]> Generate(InvoiceDTO dto);
         Task<ResponseDTO<object>> SendInvoiceEmailAsync(string toEmail, string guestName, byte[] pdfData, string invoiceNumber);
         Task<ResponseDTO<object>> SendReservationEmailAsync(string toEmail, string guestName);
-        Task<ResponseDTO<byte[]>> GetInvoicePdfAsync(int reservationId);
+        Task<ResponseDTO<byte[]>> GetInvoicePdfAsync(int reservationId, bool send);
     }
 }

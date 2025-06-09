@@ -21,9 +21,9 @@ namespace HRS_ServiceLayer.Services
             {
                 var reservation = await unitOfWork.Reservations
                 .FindAsync(r => r.Id == reservationId,
-                    nameof(Reservation.Room),
+                    true, nameof(Reservation.Room),
                     nameof(Reservation.User));
-                var payment = await unitOfWork.Payments.FindAsync(p => p.ReservationId == reservationId);
+                var payment = await unitOfWork.Payments.FindAsync(p => p.ReservationId == reservationId, true);
                 if (reservation == null || reservation.ReservationStatus != ReservationStatus.Confirmed
                     || payment.PaymentStatus != PaymentStatus.Paid)
                     return new ResponseDTO<InvoiceDTO>("Reservation not found or not completed", null);
@@ -187,7 +187,7 @@ namespace HRS_ServiceLayer.Services
             }
         }
 
-        public async Task<ResponseDTO<byte[]>> GetInvoicePdfAsync(int reservationId)
+        public async Task<ResponseDTO<byte[]>> GetInvoicePdfAsync(int reservationId, bool send)
         {
             try
             {
@@ -197,14 +197,16 @@ namespace HRS_ServiceLayer.Services
                 var invoice = response.Data;
                 var response1 = Generate(invoice);
                 var pdfBytes = response1.Data;
-
-                BackgroundJob.Enqueue<IEmailService>(email =>
-                            email.SendInvoiceEmailAsync(
-                            invoice.GuestEmail,
-                            invoice.GuestName,
-                            pdfBytes,
-                            invoice.InvoiceNumber
-                        ));
+                if (send)
+                {
+                    BackgroundJob.Enqueue<IEmailService>(email =>
+                                email.SendInvoiceEmailAsync(
+                                invoice.GuestEmail,
+                                invoice.GuestName,
+                                pdfBytes,
+                                invoice.InvoiceNumber
+                            ));
+                }
                 return new ResponseDTO<byte[]>("Invoice Generation succedded", pdfBytes);
             }
             catch (Exception ex)

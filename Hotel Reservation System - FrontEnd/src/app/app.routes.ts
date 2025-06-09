@@ -7,7 +7,7 @@ import { AuthGuard } from './guards/auth.guard';
 import { AllUpcomingReservationComponent } from './components/ReservationModule/allUpcomingReservation/allUpcomingReservation.component';
 import { MyReservationsComponent } from './components/ReservationModule/myReservations/myReservations.component';
 import { MyUpcomingReservationsComponent } from './components/ReservationModule/myUpcomingReservations/myUpcomingReservations.component';
-import { OfferComponent } from './components/OfferModule/allOffers/offer.component';
+import { OfferComponent } from './components/offer/offer.component';
 import { RoomComponent } from './components/RoomModule/allRooms/room.component';
 
 export const routes: Routes = [

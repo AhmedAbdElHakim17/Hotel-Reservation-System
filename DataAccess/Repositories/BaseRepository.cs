@@ -16,26 +16,32 @@ namespace HRS_DataAccess.Repositories
         }
         #endregion
         #region Handles Functions
-        public Task<List<T>> GetAllAsync(params string[] includes)
+        public Task<List<T>> GetAllAsync(bool AsNoTracking, params string[] includes)
         {
-            IQueryable<T> query = context.Set<T>().AsNoTracking();
+            IQueryable<T> query = context.Set<T>();
+            if (AsNoTracking)
+                query = query.AsNoTracking();
             if (includes != null)
                 foreach (var include in includes)
                     query = query.Include(include);
             return query.ToListAsync();
         }
         public async Task<T?> GetByIdAsync(int id) => await context.Set<T>().FindAsync(id);
-        public Task<T?> FindAsync(Expression<Func<T, bool>> predicate, params string[] includes)
+        public Task<T?> FindAsync(Expression<Func<T, bool>> predicate, bool AsNoTracking, params string[] includes)
         {
-            IQueryable<T> query = context.Set<T>().AsNoTracking();
+            IQueryable<T> query = context.Set<T>();
+            if (AsNoTracking)
+                query = query.AsNoTracking();
             if (includes != null)
                 foreach (var include in includes)
                     query = query.Include(include);
             return query.FirstOrDefaultAsync(predicate);
         }
-        public Task<List<T>> FindAllAsync(Expression<Func<T, bool>> predicate, params string[] includes)
+        public Task<List<T>> FindAllAsync(Expression<Func<T, bool>> predicate, bool AsNoTracking, params string[] includes)
         {
-            IQueryable<T> query = context.Set<T>().AsNoTracking();
+            IQueryable<T> query = context.Set<T>();
+            if (AsNoTracking)
+                query = query.AsNoTracking();
             if (includes != null)
                 foreach (var include in includes)
                     query = query.Include(include);

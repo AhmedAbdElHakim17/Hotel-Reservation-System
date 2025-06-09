@@ -1,4 +1,5 @@
-﻿using HRS_BussinessLogic.DTOs.Queries;
+﻿using HRS_BussinessLogic.DTOs.Commands;
+using HRS_BussinessLogic.DTOs.Queries;
 using HRS_DataAccess.Models;
 using HRS_SharedLayer.Interfaces.IBases;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,7 +12,7 @@ namespace HRS_BussinessLogic.Attributes
         protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
         {
             var validator = validationContext.GetService<IBaseValidator<Room>>();
-            var room = (RoomGetDTO)validationContext.ObjectInstance;
+            var room = (RoomPostDTO)validationContext.ObjectInstance;
             if (!validator.IsRoomNumberUnique(room.RoomNum,room.Id))
                 return new ValidationResult("Room Number already Exists");
             return ValidationResult.Success;

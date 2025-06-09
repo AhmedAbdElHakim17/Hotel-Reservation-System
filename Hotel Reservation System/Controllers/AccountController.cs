@@ -1,6 +1,7 @@
 ﻿using HRS_BussinessLogic.DTOs.Commands;
 using HRS_Presentation.Middlewares;
 using HRS_ServiceLayer.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HRS.Presentation.Controllers
@@ -41,6 +42,7 @@ namespace HRS.Presentation.Controllers
                 return StatusCode(500, "Internal Server Error");
             }
         }
+        [Authorize]
         [HttpGet("UserRole")]
         public async Task<IActionResult> GetUserRole()
         {

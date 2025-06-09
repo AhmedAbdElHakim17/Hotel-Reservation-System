@@ -116,11 +116,11 @@ namespace HRS.Presentation
             var app = builder.Build();
             var recurringJob = app.Services.GetRequiredService<IRecurringJobManager>();
             recurringJob.AddOrUpdate<ReservationCleanupService>("ReservatinCleanup",
-                x => x.MarkExpiredReservationsAsync(), Cron.Hourly());
-            recurringJob.AddOrUpdate<ReservationStatusService>("UpdateRoomAvailability",
-                x => x.UpdateRoomAvailabilityAsync(), Cron.Hourly());
+                x => x.MarkExpiredReservationsAsync(), Cron.Hourly(32));
+            //recurringJob.AddOrUpdate<ReservationStatusService>("UpdateRoomAvailability",
+            //    x => x.UpdateRoomAvailabilityAsync(), Cron.Hourly(47));
             recurringJob.AddOrUpdate<OfferCleanupService>("OfferCleanup",
-                x => x.MarkExpiredOffers(), Cron.Hourly());
+                x => x.MarkExpiredOffers(), Cron.Daily());
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

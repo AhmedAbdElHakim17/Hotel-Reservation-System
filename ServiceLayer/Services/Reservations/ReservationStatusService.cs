@@ -23,17 +23,15 @@ namespace HRS_ServiceLayer.Services.Reservations
                     r => r.CheckInDate <= DateTime.Now &&
                          r.CheckOutDate >= DateTime.Now &&
                          r.ReservationStatus == ReservationStatus.CheckedIn,
-                     nameof(Reservation.Room)
+                     false, nameof(Reservation.Room)
                 );
             foreach (var r in ActiveRes)
             {
                 if (r.Room != null)
                 {
                     r.Room.IsAvailable = false;
-                    unitOfWork.Rooms.Update(r.Room);
                     logger.LogInformation($"Room Number:{r.Room.RoomNum} is now occupied");
                 }
-                unitOfWork.Reservations.Update(r);
             }
             await unitOfWork.CompleteAsync();
         }

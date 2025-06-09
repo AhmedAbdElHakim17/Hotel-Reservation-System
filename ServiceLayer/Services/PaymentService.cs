@@ -50,7 +50,7 @@ namespace HRS_ServiceLayer.Services
         {
             try
             {
-                var payments = await unitOfWork.Payments.GetAllAsync();
+                var payments = await unitOfWork.Payments.GetAllAsync(true);
                 if (payments == null) return new ResponseDTO<List<PaymentDTO>>("Payments not found", null);
 
                 var resultDTO = mapper.Map<List<PaymentDTO>>(payments);
@@ -71,7 +71,7 @@ namespace HRS_ServiceLayer.Services
                 var reservations = (await unitOfWork.Reservations
                     .FindAllAsync(r => r.UserId == user.Id.ToString() &&
                                        r.Id == reservationId &&
-                                       r.CheckOutDate >= DateTime.Now));
+                                       r.CheckOutDate >= DateTime.Now, true));
                 if (reservations == null || reservations.Count == 0)
                 {
                     return new ResponseDTO<Session>("Invalid Reservation Id, Please enter your reservation Id correctly", null);
@@ -82,7 +82,7 @@ namespace HRS_ServiceLayer.Services
                 if (amount != reservation.TotalAmount)
                     return new ResponseDTO<Session>("Incorrect Input, Please enter the requested amount", null);
 
-                var resPayment = await unitOfWork.Payments.FindAsync(p => p.ReservationId == reservationId);
+                var resPayment = await unitOfWork.Payments.FindAsync(p => p.ReservationId == reservationId, true);
                 if (resPayment != null)
                 {
                     return new ResponseDTO<Session>("This Reservation is paid before, please try again", null);
@@ -145,7 +145,7 @@ namespace HRS_ServiceLayer.Services
 
                     var reservation = await unitOfWork.Reservations
                         .FindAsync(r => r.Id == int.Parse(reservationId),
-                        nameof(Reservation.Room));
+                        false, nameof(Reservation.Room));
                     if (reservation != null)
                     {
                         reservation.ReservationStatus = ReservationStatus.Confirmed;
@@ -160,10 +160,9 @@ namespace HRS_ServiceLayer.Services
                         };
 
                         await unitOfWork.Payments.AddAsync(payment);
-                        unitOfWork.Reservations.Update(reservation);
                         await unitOfWork.CompleteAsync();
 
-                        var response = await emailService.GetInvoicePdfAsync(reservation.Id);
+                        var response = await emailService.GetInvoicePdfAsync(reservation.Id,true);
                         if (!response.IsSuccess)
                             return new ResponseDTO<PaymentDTO>("Invoce doesn't exist", null);
                     }

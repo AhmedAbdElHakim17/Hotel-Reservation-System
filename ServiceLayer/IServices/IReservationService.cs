@@ -12,6 +12,7 @@ namespace HRS_ServiceLayer.IServices
 
         Task<ResponseDTO<List<ReservationGetDTO>>> GetAllUserReservationsAsync(ClaimsPrincipal user);
         Task<ResponseDTO<List<ReservationGetDTO>>> GetUserUpcomingReservationsAsync(ClaimsPrincipal user);
+        Task<ResponseDTO<ReservationGetDTO>> GetReservationById(int id);
         Task<ResponseDTO<ReservationGetDTO>> AddReservationAsync(ReservationPostDTO reservationDTO, ClaimsPrincipal user);
 
 

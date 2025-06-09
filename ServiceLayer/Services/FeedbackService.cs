@@ -21,7 +21,7 @@ namespace HRS_ServiceLayer.Services
         {
             try
             {
-                var feedbacks = await unitOfWork.Feedbacks.GetAllAsync(nameof(Feedback.User));
+                var feedbacks = await unitOfWork.Feedbacks.GetAllAsync(true, nameof(Feedback.User));
                 if (feedbacks == null || feedbacks.Count == 0)
                     return new ResponseDTO<List<FeedbackDTO>>("No Feedbacks retrieved", null);
                 var resultDTO = mapper.Map<List<FeedbackDTO>>(feedbacks);
@@ -41,7 +41,7 @@ namespace HRS_ServiceLayer.Services
                 var user = await unitOfWork.UserManager.FindByNameAsync(User.Identity.Name);
                 if (user == null)
                     return new ResponseDTO<List<FeedbackDTO>>("User not found", null);
-                var feedbacks = await unitOfWork.Feedbacks.FindAllAsync(f => f.UserId == user.Id, nameof(Feedback.User));
+                var feedbacks = await unitOfWork.Feedbacks.FindAllAsync(f => f.UserId == user.Id, true, nameof(Feedback.User));
                 if (feedbacks == null || feedbacks.Count == 0)
                     return new ResponseDTO<List<FeedbackDTO>>("No Feedbacks Retrieved", null);
                 var resultDTO = mapper.Map<List<FeedbackDTO>>(feedbacks);
@@ -53,22 +53,23 @@ namespace HRS_ServiceLayer.Services
             }
 
         }
-        public async Task<ResponseDTO<FeedbackDTO>> AddFeedbackAsync(FeedbackDTO feedbackDTO)
+        public async Task<ResponseDTO<FeedbackDTO>> AddFeedbackAsync(FeedbackDTO feedbackDTO, ClaimsPrincipal claims)
         {
             try
             {
-                var user = await unitOfWork.UserManager.FindByNameAsync(feedbackDTO.UserName);
+                var user = await unitOfWork.UserManager.FindByIdAsync(claims.FindFirstValue(ClaimTypes.NameIdentifier));
                 if (user == null)
                     return new ResponseDTO<FeedbackDTO>("User not found", null);
                 var validReservation = await unitOfWork.Reservations
-                    .FindAsync(r => r.User == user && r.Id == feedbackDTO.ReservationId);
+                    .FindAsync(r => r.User == user && r.Id == feedbackDTO.ReservationId,true);
                 if (validReservation == null)
                     return new ResponseDTO<FeedbackDTO>("Invalid ReservationId, please enter a correct one",null);
-                var Exist = await unitOfWork.Feedbacks.FindAsync(f => f.ReservationId == validReservation.Id);
+                var Exist = await unitOfWork.Feedbacks.FindAsync(f => f.ReservationId == validReservation.Id, true);
                 if (Exist != null)
                     return new ResponseDTO<FeedbackDTO>("This Reservation has a feedback already, You can Update the feedback",null);
                 var feedback = mapper.Map<Feedback>(feedbackDTO);
                 feedback.UserId = user.Id;
+                feedback.SubmittedAt = DateTime.Now;
                 await unitOfWork.Feedbacks.AddAsync(feedback);
                 await unitOfWork.CompleteAsync();
                 mapper.Map(feedback,feedbackDTO);
@@ -83,7 +84,7 @@ namespace HRS_ServiceLayer.Services
         {
             try
             {
-                var feedback = await unitOfWork.Feedbacks.FindAsync(f => f.Id == id);
+                var feedback = await unitOfWork.Feedbacks.FindAsync(f => f.Id == id, true);
                 if (feedback == null)
                     return new ResponseDTO<FeedbackDTO>("Feedback not found", null);
                 if (feedbackDTO.Id != id)
@@ -102,7 +103,7 @@ namespace HRS_ServiceLayer.Services
         {
             try
             {
-                var feedback = await unitOfWork.Feedbacks.FindAsync(f => f.Id == id);
+                var feedback = await unitOfWork.Feedbacks.FindAsync(f => f.Id == id, true);
                 if (feedback == null)
                     return new ResponseDTO<FeedbackDTO>("Feedback not found", null);
                 unitOfWork.Feedbacks.Delete(feedback);

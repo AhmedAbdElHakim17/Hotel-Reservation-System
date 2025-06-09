@@ -14,7 +14,7 @@ namespace HRS_ServiceLayer.Services.Offers
         public async Task MarkExpiredOffers()
         {
             var expiredOffers = await unitOfWork.Offers
-                .FindAllAsync(o => o.EndDate.Day < DateTime.Now.Day);
+                .FindAllAsync(o => o.EndDate.Day < DateTime.Now.Day, false);
             if (expiredOffers == null) return;
             foreach (var offer in expiredOffers)
             {

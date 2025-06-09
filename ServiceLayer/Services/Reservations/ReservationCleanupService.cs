@@ -1,7 +1,12 @@
-﻿using HRS_BussinessLogic.Models;
+﻿using HRS_BussinessLogic.DTOs.Queries;
+using HRS_BussinessLogic.Models;
 using HRS_DataAccess;
+using HRS_DataAccess.Models;
 using HRS_SharedLayer.Enums;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Stripe.Checkout;
+using Stripe;
 
 namespace HRS_ServiceLayer.Services.Reservations
 {
@@ -19,25 +24,48 @@ namespace HRS_ServiceLayer.Services.Reservations
         {
             var expiredRes = await unitOfWork.Reservations
                 .FindAllAsync(
-                    r => (r.CheckOutDate <= DateTime.Now &&
+                    r => r.ReservationStatus != ReservationStatus.Expired && (
+                    (r.CheckOutDate <= DateTime.Now &&
                          r.ReservationStatus == ReservationStatus.CheckedIn)
                          ||
                          (r.CheckInDate <= DateTime.Now &&
                          (r.ReservationStatus == ReservationStatus.Confirmed ||
-                         r.ReservationStatus == ReservationStatus.Pending)),
+                         r.ReservationStatus == ReservationStatus.Pending))), false,
                      nameof(Reservation.Room)
                      );
             foreach (var r in expiredRes)
             {
-                var previosStatus = r.ReservationStatus;
-                r.ReservationStatus = ReservationStatus.Expired;
-                if (previosStatus == ReservationStatus.CheckedIn && r.Room != null)
+                if (r.ReservationStatus != ReservationStatus.Confirmed)
                 {
-                    r.Room.IsAvailable = true;
-                    unitOfWork.Rooms.Update(r.Room);
+                    var previosStatus = r.ReservationStatus;
+                    r.ReservationStatus = ReservationStatus.Expired;
+                    if (previosStatus == ReservationStatus.CheckedIn && r.Room != null)
+                    {
+                        r.Room.IsAvailable = true;
+                    }
+                    logger.LogInformation($"Reservation Status with id {r.Id} is Expired");
                 }
-                logger.LogInformation($"Reservation Status with id {r.Id} is Expired");
-                unitOfWork.Reservations.Update(r);
+                else
+                {
+                    var sessionService = new SessionService();
+                    var allSessions = await sessionService.ListAsync(new SessionListOptions { Limit = 100 });
+                    var session = allSessions.FirstOrDefault(s => s.ClientReferenceId == r.Id.ToString());
+                    if (session == null || string.IsNullOrEmpty(session.PaymentIntentId))
+                        return;
+                    var payment = await unitOfWork.Payments.FindAsync(p => p.ReservationId == r.Id, false);
+                    if (payment == null || payment.PaymentStatus != PaymentStatus.Paid)
+                        return;
+
+                    var refundService = new RefundService();
+                    var refund = await refundService.CreateAsync(new RefundCreateOptions
+                    {
+                        PaymentIntent = session.PaymentIntentId.ToString(),
+                    });
+                    var previosStatus = r.ReservationStatus;
+                    r.ReservationStatus = ReservationStatus.Expired;
+                    payment.PaymentStatus = PaymentStatus.Refunded;
+                    logger.LogInformation($"Reservation with id {r.Id} is refunded");
+                }
             }
             await unitOfWork.CompleteAsync();
         }

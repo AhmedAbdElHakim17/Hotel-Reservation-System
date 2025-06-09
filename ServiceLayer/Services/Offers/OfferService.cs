@@ -2,11 +2,6 @@
 using HRS_DataAccess.Models;
 using HRS_DataAccess;
 using HRS_ServiceLayer.IServices;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using HRS_BussinessLogic.DTOs.Queries;
 
 namespace HRS_ServiceLayer.Services.Offers
@@ -26,7 +21,7 @@ namespace HRS_ServiceLayer.Services.Offers
         {
             try
             {
-                var offers = await unitOfWork.Offers.GetAllAsync();
+                var offers = await unitOfWork.Offers.GetAllAsync(true);
                 if (offers == null || offers.Count == 0)
                     return new ResponseDTO<List<OfferDTO>>("No offers found", null);
 
@@ -58,7 +53,7 @@ namespace HRS_ServiceLayer.Services.Offers
         {
             try
             {
-                var offer = await unitOfWork.Offers.FindAsync(r => r.Id == id);
+                var offer = await unitOfWork.Offers.FindAsync(r => r.Id == id, false);
                 if (offer == null)
                     return new ResponseDTO<OfferDTO>("offer not found", null);
 
@@ -82,7 +77,7 @@ namespace HRS_ServiceLayer.Services.Offers
         {
             try
             {
-                var offer = await unitOfWork.Offers.FindAsync(r => r.Id == id);
+                var offer = await unitOfWork.Offers.FindAsync(r => r.Id == id, false);
                 if (offer == null)
                     return new ResponseDTO<OfferDTO>("Offer not found", null);
 
